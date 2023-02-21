@@ -26,9 +26,8 @@ public class MealsMicroserviceApplication {
 	}
 
 
-	@Autowired
-	@Bean
-	@Transactional
+	//@Autowired
+	//@Bean
 	public String mealTest(MealRepository mealRepository, IgredientRepository igredientRepository, SubstanceRepository substanceRepository) {
 		Substance substance1 = Substance.builder()
 				.name("yoghurt")
