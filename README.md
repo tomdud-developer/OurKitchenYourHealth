@@ -17,4 +17,10 @@ System is designed in microservices architecture. Each microservice has own buss
 9. Delivery microservice
 10. Demand microservice
 
-!![App Screenshot](Catering.svg)
+[Structure](Catering.svg)
+
+## Meals microservice
+
+Meals microservice offers access to ready to order meals, meals creator, ingredients adding, calories calculating.
+
+[Structure](MealsMicroservice.svg)
