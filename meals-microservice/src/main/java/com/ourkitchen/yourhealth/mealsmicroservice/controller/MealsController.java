@@ -35,4 +35,14 @@ public class MealsController {
     public Meal saveMeal(@RequestBody Meal meal) {
         return mealService.saveMeal(meal);
     }
+
+    @DeleteMapping("meal/{mealId}")
+    public void deleteMeal(@PathVariable String mealId) {
+        mealService.deleteMeal(mealId);
+    }
+
+    @GetMapping("meal")
+    public List<Meal> getMeals() {
+        return mealService.getAvailableMeals();
+    }
 }

@@ -28,6 +28,7 @@ public class MealService {
     private final SubstanceRepository substanceRepository;
     private final MongoTemplate mongoTemplate;
 
+    @Transactional
     public Substance saveSubstance(Substance substance) {
        /* Query query = new Query().addCriteria(Criteria.where("id").is(substance.getId()));
         Update update = new Update().set("name", substance.getName());
@@ -55,10 +56,12 @@ public class MealService {
         return igredientRepository.save(igredient);
     }
 
+    @Transactional
     public List<Substance> getAllAvailableSubstances() {
         return substanceRepository.findAll();
     }
 
+    @Transactional
     public Meal saveMeal(Meal meal) {
         List<Igredient> igredients = new ArrayList<>();
         meal.getIgredients().forEach((igredient) -> {
@@ -71,5 +74,25 @@ public class MealService {
         meal.setIgredients(igredients);
 
         return mealRepository.save(meal);
+    }
+
+    @Transactional
+    public List<Meal> getAvailableMeals() {
+        return mealRepository.findAll();
+    }
+
+    @Transactional
+    public void deleteMeal(String mealId) {
+        Optional<Meal> optionalMeal = mealRepository.findById(mealId);
+        optionalMeal.ifPresentOrElse((meal) -> {
+            meal.getIgredients()
+                    .forEach(igredient -> igredientRepository.deleteById(
+                            igredient.getId()
+                    ));
+        },() -> {
+            throw new RuntimeException("Didn't find meal");
+        });
+
+        mealRepository.deleteById(mealId);
     }
 }
