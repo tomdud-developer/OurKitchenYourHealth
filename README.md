@@ -23,4 +23,4 @@ System is designed in microservices architecture. Each microservice has own buss
 
 Meals microservice offers access to ready to order meals, meals creator, ingredients adding, calories calculating.
 
-[Structure](MealsMicroservice.svg)
+![Structure](MealsMicroservice.svg)
