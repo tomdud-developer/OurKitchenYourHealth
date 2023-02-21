@@ -27,6 +27,7 @@
 
     <modules>
         <module>meals-microservice</module>
+        <module>orders-microservice</module>
     </modules>
 
     <dependencyManagement>
