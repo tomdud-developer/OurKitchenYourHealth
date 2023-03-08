@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("api/meals-microservice")
+@RequestMapping("api/v1/meals")
 @RequiredArgsConstructor
 public class MealsController {
 
