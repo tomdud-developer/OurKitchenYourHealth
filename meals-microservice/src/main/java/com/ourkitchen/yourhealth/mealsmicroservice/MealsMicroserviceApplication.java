@@ -75,7 +75,7 @@ public class MealsMicroserviceApplication {
 
 		mealRepository.save(meal);
 
-		substanceRepository.findById("63f4acc8f562b827b2b5c86b").get().setProteins(new BigDecimal("999999.999"));
+		//substanceRepository.findById("63f4acc8f562b827b2b5c86b").get().setProteins(new BigDecimal("999999.999"));
 
 		return "ok";
 	}

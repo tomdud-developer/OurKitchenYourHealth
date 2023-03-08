@@ -26,7 +26,7 @@ public class MealsController {
     public List<Substance> getSubstances() {
         return mealService.getAllAvailableSubstances();
     }
-    @PostMapping()
+    @PostMapping("igredient")
     public Igredient saveIgredient(@RequestBody Igredient igredient) {
         return mealService.saveIgredient(igredient);
     }

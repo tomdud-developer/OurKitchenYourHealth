@@ -66,8 +66,7 @@ public class MealService {
         List<Igredient> igredients = new ArrayList<>();
         meal.getIgredients().forEach((igredient) -> {
             Substance substance = igredient.getSubstance();
-            if(substance == null) throw new RuntimeException("You didn't provie substance");
-
+            if(substance == null) throw new RuntimeException("You didn't provide substance");
             igredients.add(this.saveIgredient(igredient));
         });
 
