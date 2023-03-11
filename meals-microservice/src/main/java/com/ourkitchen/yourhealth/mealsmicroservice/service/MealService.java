@@ -5,15 +5,12 @@ import com.ourkitchen.yourhealth.mealsmicroservice.model.Meal;
 import com.ourkitchen.yourhealth.mealsmicroservice.model.Substance;
 import com.ourkitchen.yourhealth.mealsmicroservice.repository.IgredientRepository;
 import com.ourkitchen.yourhealth.mealsmicroservice.repository.MealRepository;
+import com.ourkitchen.yourhealth.mealsmicroservice.repository.ReactiveMealRepository;
 import com.ourkitchen.yourhealth.mealsmicroservice.repository.SubstanceRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.mongodb.core.FindAndModifyOptions;
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import reactor.core.publisher.Flux;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,8 +22,9 @@ public class MealService {
 
     private final IgredientRepository igredientRepository;
     private final MealRepository mealRepository;
+
+    private final ReactiveMealRepository reactiveMealRepository;
     private final SubstanceRepository substanceRepository;
-    private final MongoTemplate mongoTemplate;
 
     @Transactional
     public Substance saveSubstance(Substance substance) {
@@ -76,8 +74,8 @@ public class MealService {
     }
 
     @Transactional
-    public List<Meal> getAvailableMeals() {
-        return mealRepository.findAll();
+    public Flux<Meal> getAvailableMeals() {
+        return reactiveMealRepository.findAll();
     }
 
     @Transactional
@@ -93,5 +91,12 @@ public class MealService {
         });
 
         mealRepository.deleteById(mealId);
+    }
+
+    public Flux<Boolean> isMealsAvailable(List<String> mealsIds) {
+        return Flux.fromIterable(mealsIds).map(mealId -> {
+            Meal meal = reactiveMealRepository.findById(mealId).block();
+            return meal != null;
+        });
     }
 }

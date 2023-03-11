@@ -11,6 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
+import org.springframework.data.mongodb.repository.config.EnableReactiveMongoRepositories;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
@@ -19,6 +21,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 @SpringBootApplication
+@EnableReactiveMongoRepositories
+@EnableMongoRepositories
 public class MealsMicroserviceApplication {
 
 	public static void main(String[] args) {

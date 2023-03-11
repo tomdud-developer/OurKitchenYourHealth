@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 @Service
 @RequiredArgsConstructor
@@ -31,8 +32,8 @@ public class OrderService {
                     .additionalProductsIds(day.getAdditionalProductsIds())
                     .realizationDate(order.getStartDate().plusDays(days).toLocalDate())
                     .build();
-            orderOneDayRepository.save(day);
-            orderOneDayList.add(orderOneDay);
+            OrderOneDay savedOrderOneDay = orderOneDayRepository.save(orderOneDay);
+            orderOneDayList.add(savedOrderOneDay);
             days++;
         };
 
