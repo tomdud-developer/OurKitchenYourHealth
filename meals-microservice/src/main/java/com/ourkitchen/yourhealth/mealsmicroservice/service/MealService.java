@@ -8,6 +8,7 @@ import com.ourkitchen.yourhealth.mealsmicroservice.repository.MealRepository;
 import com.ourkitchen.yourhealth.mealsmicroservice.repository.ReactiveMealRepository;
 import com.ourkitchen.yourhealth.mealsmicroservice.repository.SubstanceRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Flux;
@@ -18,6 +19,7 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class MealService {
 
     private final IgredientRepository igredientRepository;
@@ -94,6 +96,9 @@ public class MealService {
     }
 
     public Flux<Boolean> isMealsAvailable(List<String> mealsIds) {
+
+        log.info("Checkings meals ids");
+
         return Flux.fromIterable(mealsIds).map(mealId -> {
             Meal meal = reactiveMealRepository.findById(mealId).block();
             return meal != null;

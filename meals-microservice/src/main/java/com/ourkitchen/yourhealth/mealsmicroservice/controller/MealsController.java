@@ -7,6 +7,8 @@ import com.ourkitchen.yourhealth.mealsmicroservice.model.Substance;
 import com.ourkitchen.yourhealth.mealsmicroservice.service.MealService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.mongodb.repository.config.EnableReactiveMongoRepositories;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 
@@ -33,17 +35,17 @@ public class MealsController {
         return mealService.saveIgredient(igredient);
     }
 
-    @PostMapping("meals")
-    public Meal saveMeal(@RequestBody Meal meal) {
-        return mealService.saveMeal(meal);
+    @PostMapping()
+    public ResponseEntity<Meal> saveMeal(@RequestBody Meal meal) {
+        return new ResponseEntity<>(mealService.saveMeal(meal), HttpStatus.CREATED);
     }
 
-    @DeleteMapping("meals/{mealId}")
+    @DeleteMapping("{mealId}")
     public void deleteMeal(@PathVariable String mealId) {
         mealService.deleteMeal(mealId);
     }
 
-    @GetMapping("meals")
+    @GetMapping("")
     public Flux<Meal> getMeals() {
         return mealService.getAvailableMeals();
     }

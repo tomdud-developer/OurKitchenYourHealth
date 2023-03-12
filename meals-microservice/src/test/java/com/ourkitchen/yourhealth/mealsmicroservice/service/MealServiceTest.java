@@ -1,5 +1,6 @@
 package com.ourkitchen.yourhealth.mealsmicroservice.service;
 
+import com.ourkitchen.yourhealth.mealsmicroservice.MealsMicroserviceApplication;
 import com.ourkitchen.yourhealth.mealsmicroservice.model.Igredient;
 import com.ourkitchen.yourhealth.mealsmicroservice.model.Meal;
 import com.ourkitchen.yourhealth.mealsmicroservice.model.MealType;
@@ -8,31 +9,55 @@ import com.ourkitchen.yourhealth.mealsmicroservice.repository.IgredientRepositor
 import com.ourkitchen.yourhealth.mealsmicroservice.repository.MealRepository;
 import com.ourkitchen.yourhealth.mealsmicroservice.repository.ReactiveMealRepository;
 import com.ourkitchen.yourhealth.mealsmicroservice.repository.SubstanceRepository;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.apache.http.client.utils.URIBuilder;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 import org.springframework.data.mongodb.repository.config.EnableReactiveMongoRepositories;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.reactive.server.WebTestClient;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MockMvcBuilder;
+import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
+import reactor.core.publisher.Flux;
+import reactor.test.StepVerifier;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.net.URI;
+import java.util.Arrays;
 import java.util.List;
-
+import java.util.stream.Stream;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-//@ActiveProfiles("test")
-//@AutoConfigureWebTestClient
+@SpringBootTest(
+        webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT,
+        classes= MealsMicroserviceApplication.class
+)
+@ActiveProfiles("test")
+@AutoConfigureWebTestClient
 class MealServiceTest {
 
-/*    @Autowired
+    @Autowired
     private WebTestClient webTestClient;
+
+    @Autowired
+    private WebApplicationContext webApplicationContext;
+
+    private MockMvc mockMvc;;
+
+    @Autowired ObjectMapper objectMapper;
 
     @Autowired
     private ReactiveMealRepository reactiveMealRepository;
@@ -47,29 +72,45 @@ class MealServiceTest {
     private SubstanceRepository substanceRepository;
 
 
+    private Substance substance1;
+    private Substance substance2;
+    private Substance substance3;
+    private Igredient igredient1_1;
+    private Igredient igredient1_2;
+    private Igredient igredient2_2;
+    private Igredient igredient2_3;
+
+    private Meal meal1;
+    private Meal meal2;
+
+
+
     @BeforeEach
     void setUp() {
-        Substance substance1 = Substance.builder()
+
+        this.mockMvc = MockMvcBuilders.webAppContextSetup(this.webApplicationContext).build();
+
+        substance1 = Substance.builder()
                 .id("Substance1_ID")
                 .name("Flovour")
-                .caloriesIn100g(new BigInteger("454.4"))
+                .caloriesIn100g(new BigInteger("454"))
                 .carboHydrates(new BigDecimal("40"))
                 .fat(new BigDecimal("0.9"))
                 .proteins(new BigDecimal("2.4"))
                 .sugars(new BigDecimal("3.0"))
                 .build();
 
-        Substance substance2 = Substance.builder()
+        substance2 = Substance.builder()
                 .id("Substance2_ID")
                 .name("Sugar")
-                .caloriesIn100g(new BigInteger("500.1"))
+                .caloriesIn100g(new BigInteger("500"))
                 .carboHydrates(new BigDecimal("100"))
                 .fat(new BigDecimal("0"))
                 .proteins(new BigDecimal("0"))
                 .sugars(new BigDecimal("100"))
                 .build();
 
-        Substance substance3 = Substance.builder()
+        substance3 = Substance.builder()
                 .id("Substance3_ID")
                 .name("Milk")
                 .caloriesIn100g(new BigInteger("60"))
@@ -83,25 +124,25 @@ class MealServiceTest {
         substance2 = substanceRepository.save(substance2);
         substance3 = substanceRepository.save(substance3);
 
-        Igredient igredient1_1 = Igredient.builder()
+        igredient1_1 = Igredient.builder()
                 .id("igredient1_1_id")
                 .substance(substance1)
                 .weight(new BigDecimal("40.5"))
                 .build();
 
-        Igredient igredient1_2 = Igredient.builder()
+        igredient1_2 = Igredient.builder()
                 .id("igredient1_2_id")
                 .substance(substance2)
                 .weight(new BigDecimal("54.5"))
                 .build();
 
-        Igredient igredient2_2 = Igredient.builder()
+        igredient2_2 = Igredient.builder()
                 .id("igredient2_2_id")
                 .substance(substance2)
                 .weight(new BigDecimal("40.5"))
                 .build();
 
-        Igredient igredient2_3 = Igredient.builder()
+        igredient2_3 = Igredient.builder()
                 .id("igredient2_3_id")
                 .substance(substance3)
                 .weight(new BigDecimal("90.4"))
@@ -112,7 +153,7 @@ class MealServiceTest {
         igredient2_2 = igredientRepository.save(igredient2_2);
         igredient2_3 = igredientRepository.save(igredient2_3);
 
-        Meal meal1 = Meal.builder()
+        meal1 = Meal.builder()
                 .id("meal1_id")
                 .type(MealType.BREAKFAST)
                 .name("FirstMeal")
@@ -120,7 +161,7 @@ class MealServiceTest {
                 .igredients(List.of(igredient1_1, igredient1_2))
                 .build();
 
-        Meal meal2 = Meal.builder()
+        meal2 = Meal.builder()
                 .id("meal2_id")
                 .type(MealType.DINNER)
                 .name("SecondMeal")
@@ -131,13 +172,34 @@ class MealServiceTest {
         meal1 = mealRepository.save(meal2);
         meal2 = mealRepository.save(meal2);
     }
-*/
+
     @AfterEach
     void tearDown() {
+        mealRepository.deleteAll();
+        igredientRepository.deleteAll();;
+        substanceRepository.deleteAll();
     }
 
     @Test
-    void saveSubstance() {
+    void saveSubstance() throws Exception {
+        Meal meal = Meal.builder()
+                .id("meal3_id")
+                .type(MealType.SUPPER)
+                .name("NewMeal")
+                .price(new BigDecimal("33.24"))
+                .igredients(List.of(igredient2_2, igredient2_3, igredient1_1))
+                .build();
+
+        MvcResult mvcResult = this.mockMvc.perform(post("/api/v1/meals")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(meal))
+                )
+                .andExpect(MockMvcResultMatchers.status().isCreated())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.id").value(meal.getId()))
+                .andReturn();
+
+        Assertions.assertEquals("application/json",
+                mvcResult.getResponse().getContentType());
     }
 
     @Test
@@ -162,5 +224,28 @@ class MealServiceTest {
 
     @Test
     void isMealsAvailable() {
+        //given
+        Meal meal3 = new Meal();
+        meal3.setId("235235%@#%@#2342343446$%#$");
+        List<String> mealsIds = Stream.of(meal1, meal2, meal3).map(Meal::getId).toList();
+
+        URI uri = URI.create("/api/v1/meals/meals/is-exists");
+
+        Flux<Boolean> booleanFlux = webTestClient.method(HttpMethod.GET)
+                .uri(uri)
+                .bodyValue(mealsIds)
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .returnResult(Boolean.class)
+                .getResponseBody();
+
+        StepVerifier.create(booleanFlux)
+                .assertNext(Assertions::assertTrue)
+                .assertNext(Assertions::assertTrue)
+                .assertNext(Assertions::assertFalse)
+                .expectNextCount(0)
+                .verifyComplete();
+
     }
 }
