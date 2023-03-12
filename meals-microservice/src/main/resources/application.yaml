@@ -1,0 +1,54 @@
+spring:
+  profiles:
+    default: dev
+  application:
+    name: meals-microservice
+---
+spring:
+  config:
+    activate:
+      on-profile: dev
+  data:
+    mongodb:
+      authentication-database: admin
+      database: meals
+      username: username
+      password: password
+      host: localhost
+      port: 27017
+  mongodb:
+    embedded:
+      version: 4.0.21
+server:
+    port: 0
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka
+
+---
+spring:
+  config:
+    activate:
+      on-profile: test
+  application:
+    name: meals-microservice
+  data:
+    mongodb:
+      authentication-database: test
+      database: test
+  mongodb:
+    embedded:
+      version: 4.0.2
+server:
+  port: 0
+eureka:
+  client:
+    register-with-eureka: false
+    fetch-registry: false
+
+
+
+
+
+
