@@ -50,6 +50,13 @@ services:
       - ME_CONFIG_MONGODB_ADMINPASSWORD=password
       - ME_CONFIG_MONGODB_SERVER=mongodb_orders_microservice
 
+  zipkin:
+    image: openzipkin/zipkin
+    container_name: zipkin_container
+    restart: always
+    ports:
+      - "9411:9411"
+
 volumes:
   data: {}
 

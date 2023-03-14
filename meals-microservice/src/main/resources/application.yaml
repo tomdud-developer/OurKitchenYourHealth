@@ -3,6 +3,13 @@ spring:
     default: dev
   application:
     name: meals-microservice
+management:
+  tracing:
+    sampling:
+      probability: 1.0
+logging:
+  pattern:
+    level: "%5p [${spring.application.name:},%X{traceId:-},%X{spanId:-}]"
 ---
 spring:
   config:
@@ -41,6 +48,7 @@ eureka:
     fetch-registry: false
 server:
   port: 80
+
 
 
 
