@@ -28,7 +28,7 @@ public class MealsServiceClient {
                 .uri(uri)
                 .bodyValue(meaalsIds)
                 .retrieve()
-                .onStatus(HttpStatus::is4xxClientError, (clientResponse -> {
+/*                .onStatus(HttpStatus::is4xxClientError, (clientResponse -> {
                     log.info("Status code : {}", clientResponse.statusCode().value());
                     throw new RuntimeException("error");
                 }))
@@ -39,7 +39,7 @@ public class MealsServiceClient {
                 .onStatus(HttpStatus::is2xxSuccessful, (clientResponse -> {
                     log.info("Status code : {}", clientResponse.statusCode().value());
                     throw new RuntimeException("good");
-                }))
+                }))*/
                 .bodyToFlux(Boolean.class);
 
         booleanFlux.doOnEach(booleanSignal -> System.out.println(booleanSignal.get()));

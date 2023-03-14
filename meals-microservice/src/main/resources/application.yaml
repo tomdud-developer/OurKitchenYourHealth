@@ -16,9 +16,7 @@ spring:
       password: password
       host: localhost
       port: 27017
-  mongodb:
-    embedded:
-      version: 4.0.21
+
 server:
     port: 0
 eureka:
@@ -37,9 +35,6 @@ spring:
     mongodb:
       authentication-database: test
       database: test
-  mongodb:
-    embedded:
-      version: 4.0.2
 eureka:
   client:
     register-with-eureka: false
