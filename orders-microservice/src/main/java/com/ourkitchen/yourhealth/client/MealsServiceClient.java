@@ -19,7 +19,7 @@ public class MealsServiceClient {
 
     private final WebClient webClient;
 
-    URI uri = URI.create("meals-microservice/api/v1/meals/meals/is-exists");
+    URI uri = URI.create("http://localhost:8080/meals-microservice/api/v1/meals/meals/is-exists");
 
     public Flux<Boolean> areMealsExists(List<String> meaalsIds) {
         log.info("Checking mealsIds");
@@ -41,6 +41,7 @@ public class MealsServiceClient {
                     throw new RuntimeException("good");
                 }))*/
                 .bodyToFlux(Boolean.class);
+        booleanFlux.subscribe(x -> log.info("{}", x));
 
         booleanFlux.doOnEach(booleanSignal -> System.out.println(booleanSignal.get()));
         return booleanFlux.log();

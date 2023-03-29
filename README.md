@@ -19,6 +19,21 @@ System is designed in microservices architecture. Each microservice has own buss
 
 [Structure](assets/Catering.svg)
 
+
+## Client requirements
+The customer is the owner of approximately 100 restaurants and serves daily diet meals over the phone. 
+The demand for their services has consistently increased, and as a result, they require reliable software support to manage these orders.
+The orders should be taken on a website, where clients can potentially choose their preferred meals for each day. The restaurant location, which will serve the meals, should be assigned based on the client's domicile.
+
+Each day, the restaurants should have a list of ingredients to order for the following day.
+Each day, the restaurants should have a list of meals to prepare for the following day.
+
+The dietetics team should have the option to compose meals by adding ingredients and substances. 
+These meals should be available for every client at any location.
+
+
+
+
 ## Meals microservice
 
 Meals microservice offers access to ready to order meals, meals creator, ingredients adding, calories calculating.
