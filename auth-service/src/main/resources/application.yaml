@@ -20,7 +20,16 @@ spring:
     url: jdbc:postgresql://localhost:5432/auth_database
     username: username
     password: password
-
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQL82Dialect
+logging:
+  level:
+    org.hibernate.SQL: debug
+    org.hibernate.type.descriptor.sql.BasicBinder: trace
 server:
   port: 0
 eureka:
