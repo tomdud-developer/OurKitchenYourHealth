@@ -7,7 +7,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.0.2</version>
+        <version>3.0.5</version>
         <relativePath/>
     </parent>
 
@@ -21,7 +21,7 @@
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <spring.version>2.7.9</spring.version>
+        <spring.version>3.0.5</spring.version>
         <spring-cloud.version>2022.0.1</spring-cloud.version>
         <lombok.version>1.18.26</lombok.version>
         <testcontainers.version>1.17.6</testcontainers.version>
@@ -33,6 +33,7 @@
         <module>orders-microservice</module>
         <module>eureka-server</module>
         <module>api-gateway</module>
+        <module>auth-service</module>
     </modules>
 
     <dependencyManagement>
@@ -41,6 +42,11 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-starter-test</artifactId>
                 <version>${spring.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-security</artifactId>
             </dependency>
             <dependency>
                 <groupId>org.springframework.cloud</groupId>
@@ -116,6 +122,7 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
+
 
         </dependencies>
     </dependencyManagement>

@@ -1,6 +1,16 @@
 
 version: "3.8"
 services:
+
+  postgres_auth_service:
+    image: 'postgres:latest'
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: username
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: auth_database
+
   mongodb_meals_microservice:
     image: mongo
     container_name: mongodb_meals_microservice
