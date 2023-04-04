@@ -25,7 +25,7 @@ spring:
       ddl-auto: update
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.PostgreSQL82Dialect
+        dialect: org.hibernate.dialect.PostgreSQLDialect
 logging:
   level:
     org.hibernate.SQL: debug

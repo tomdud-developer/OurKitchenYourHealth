@@ -1,9 +1,7 @@
 package com.ourkitchen.yourhealth.config;
 
-import com.netflix.discovery.converters.Auto;
 import com.ourkitchen.yourhealth.model.AppUser;
 import com.ourkitchen.yourhealth.repository.AppUserRepository;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -23,7 +21,7 @@ public class UserDetailsServiceImpl implements org.springframework.security.core
 
 
         UserDetails userDetails =
-                optionalAppUser.map(appUser -> UserDetailsImplementation.builder()
+                optionalAppUser.map(appUser -> UserDetailsImplmpl.builder()
                     .username(appUser.getUsername())
                     .password(appUser.getPassword())
                     .build()
