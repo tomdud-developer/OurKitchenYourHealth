@@ -92,32 +92,29 @@ services:
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
 
-  postgres-keycloak:
-    image: postgres:13.2
-    restart: unless-stopped
-    environment:
-      POSTGRES_DB: ${POSTGRESQL_DB}
-      POSTGRES_USER: ${POSTGRESQL_USER}
-      POSTGRES_PASSWORD: ${POSTGRESQL_PASS}
-    networks:
-      - local-keycloak
-
   keycloak:
-    depends_on:
-      - postgres-keycloak
+    image: jboss/keycloak:latest
     container_name: keycloak
     environment:
-      DB_VENDOR: postgres
-      DB_ADDR: postgres
-      DB_DATABASE: ${POSTGRESQL_DB}
-      DB_USER: ${POSTGRESQL_USER}
-      DB_PASSWORD: ${POSTGRESQL_PASS}
-    image: jboss/keycloak:${KEYCLOAK_VERSION}
+      - DB_VENDOR=POSTGRES
+      - DB_ADDR=postgres
+      - DB_DATABASE=${POSTGRESQL_DB}
+      - DB_USER=${POSTGRESQL_USER}
+      - DB_PASSWORD=${POSTGRESQL_PASS}
+      - KEYCLOAK_USER=${KEYCLOAK_ADMIN_USERNAME}
+      - KEYCLOAK_PASSWORD=${KEYCLOAK_ADMIN_PASSWORD}
     ports:
-      - "28080:8080"
-    restart: unless-stopped
-    networks:
-      - local-keycloak
+      - "8180:8080"
+    depends_on:
+      - postgres
+
+  postgres:
+    container_name: postgres_for_keycloak
+    image: postgres:latest
+    environment:
+      - POSTGRES_DB=${POSTGRESQL_DB}
+      - POSTGRES_USER=${POSTGRESQL_USER}
+      - POSTGRES_PASSWORD=${POSTGRESQL_PASS}
 
 volumes:
   data: {}
@@ -125,4 +122,3 @@ volumes:
 networks:
   default:
     name: mongodb_network
-  local-keycloak:
