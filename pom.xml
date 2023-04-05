@@ -26,6 +26,7 @@
         <lombok.version>1.18.26</lombok.version>
         <testcontainers.version>1.17.6</testcontainers.version>
         <micrometer.version>1.10.5</micrometer.version>
+        <keycloak_adapter.version>21.0.2</keycloak_adapter.version>
     </properties>
 
     <modules>
@@ -122,8 +123,13 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
-
-
+            <dependency>
+                <groupId>org.keycloak.bom</groupId>
+                <artifactId>keycloak-adapter-bom</artifactId>
+                <version>${keycloak_adapter.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
