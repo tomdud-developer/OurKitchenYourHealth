@@ -31,7 +31,7 @@ logging:
     org.hibernate.SQL: debug
     org.hibernate.type.descriptor.sql.BasicBinder: trace
 server:
-  port: 0
+  port: 8989
 eureka:
   client:
     serviceUrl:
