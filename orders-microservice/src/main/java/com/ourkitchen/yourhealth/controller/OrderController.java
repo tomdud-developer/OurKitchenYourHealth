@@ -2,6 +2,7 @@ package com.ourkitchen.yourhealth.controller;
 
 import com.ourkitchen.yourhealth.model.Order;
 import com.ourkitchen.yourhealth.service.OrderService;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +21,7 @@ public class OrderController {
     private final OrderService orderService;
 
     @PostMapping
-    public ResponseEntity<Order> placeAnOrder(@RequestBody Order order) throws Exception{
+    public ResponseEntity<Order> placeAnOrder(@RequestBody Order order, HttpServletRequest request) throws Exception{
         return new ResponseEntity<>(orderService.createOrder(order), HttpStatus.CREATED);
     }
 

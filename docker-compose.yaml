@@ -103,10 +103,14 @@ services:
       - DB_PASSWORD=${POSTGRESQL_PASS}
       - KEYCLOAK_USER=${KEYCLOAK_ADMIN_USERNAME}
       - KEYCLOAK_PASSWORD=${KEYCLOAK_ADMIN_PASSWORD}
+      - JBOSS_HOME=/opt/jboss/keycloak
+      #- PROXY_ADDRESS_FORWARDING=true
     ports:
       - "8180:8080"
     depends_on:
       - postgres
+    volumes:
+      - ./keycloak/data:/opt/jboss/keycloak/standalone/data
 
   postgres:
     container_name: postgres_for_keycloak
@@ -115,6 +119,8 @@ services:
       - POSTGRES_DB=${POSTGRESQL_DB}
       - POSTGRES_USER=${POSTGRESQL_USER}
       - POSTGRES_PASSWORD=${POSTGRESQL_PASS}
+    volumes:
+      - ./keycloak/db-data:/var/lib/postgresql/data
 
 volumes:
   data: {}
