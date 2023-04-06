@@ -27,6 +27,7 @@
         <testcontainers.version>1.17.6</testcontainers.version>
         <micrometer.version>1.10.5</micrometer.version>
         <keycloak_adapter.version>21.0.2</keycloak_adapter.version>
+        <openfeign.version>12.2</openfeign.version>
     </properties>
 
     <modules>
@@ -35,6 +36,7 @@
         <module>eureka-server</module>
         <module>api-gateway</module>
         <module>auth-service</module>
+        <module>payment-microservice</module>
     </modules>
 
     <dependencyManagement>
@@ -137,6 +139,21 @@
                 <groupId>org.json</groupId>
                 <artifactId>json</artifactId>
                 <version>20230227</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.openfeign</groupId>
+                <artifactId>feign-okhttp</artifactId>
+                <version>${openfeign.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.openfeign</groupId>
+                <artifactId>feign-gson</artifactId>
+                <version>${openfeign.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.openfeign</groupId>
+                <artifactId>feign-slf4j</artifactId>
+                <version>${openfeign.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

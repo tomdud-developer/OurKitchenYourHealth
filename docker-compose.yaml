@@ -1,7 +1,6 @@
 
 version: "3.8"
 services:
-
   #postgres_auth_service:
    # image: 'postgres:latest'
     #ports:
@@ -121,6 +120,18 @@ services:
       - POSTGRES_PASSWORD=${POSTGRESQL_PASS}
     volumes:
       - ./keycloak/db-data:/var/lib/postgresql/data
+
+  postgres_payment_microservice:
+    container_name: postgres_payment_microservice
+    image: postgres:latest
+    ports:
+     - "5433:5432"
+    environment:
+      - POSTGRES_DB=payment_database
+      - POSTGRES_USER=username
+      - POSTGRES_PASSWORD=password
+
+
 
 volumes:
   data: {}
