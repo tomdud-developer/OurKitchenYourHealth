@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Flux;
 
+import java.math.BigDecimal;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -37,13 +38,15 @@ public class OrderService {
         Flux<Boolean> booleanFlux = mealsServiceClient.areMealsExists(mealsIds);
 
         booleanFlux.doOnEach(booleanSignal -> {
-            if(!booleanSignal.get())
-                throw new RuntimeException("Bad ids");
+            System.out.println(booleanSignal.get().booleanValue());
+            if(!booleanSignal.get().booleanValue())
+                throw new RuntimeException("Bad meals ids");
         });
 
 
         List<OrderOneDay> orderOneDayList = new ArrayList<>();
         long days = 0;
+        BigDecimal totalPrice = BigDecimal.ZERO;
 
         for(OrderOneDay day : order.getOrderOneDays()) {
             OrderOneDay orderOneDay = OrderOneDay.builder()
@@ -53,11 +56,13 @@ public class OrderService {
                     .build();
             OrderOneDay savedOrderOneDay = orderOneDayRepository.save(orderOneDay);
             orderOneDayList.add(savedOrderOneDay);
+           //totalPrice.add()
             days++;
         };
 
         order.setOrderOneDays(orderOneDayList);
         order.setDaysNumber(days);
+        order.setTotalPrice(totalPrice);
 
         Order savedOrder = orderRepository.save(order);
 

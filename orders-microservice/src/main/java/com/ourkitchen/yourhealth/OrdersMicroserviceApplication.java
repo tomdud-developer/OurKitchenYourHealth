@@ -14,12 +14,5 @@ public class OrdersMicroserviceApplication {
         SpringApplication.run(OrdersMicroserviceApplication.class, args);
     }
 
-    @Bean
-    public FilterRegistrationBean<JwtFilter> jwtFilterRegistration() {
-        FilterRegistrationBean<JwtFilter> registration = new FilterRegistrationBean<>();
-        registration.setFilter(new JwtFilter());
-        registration.addUrlPatterns("/api/*");
-        return registration;
-    }
 
 }

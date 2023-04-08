@@ -8,6 +8,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.DocumentReference;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -26,6 +27,5 @@ public class Order {
     @DocumentReference(lazy=true)
     private List<OrderOneDay> orderOneDays;
 
-
-
+    private BigDecimal totalPrice;
 }

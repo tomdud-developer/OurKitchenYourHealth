@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -103,5 +104,9 @@ public class MealService {
             Meal meal = reactiveMealRepository.findById(mealId).block();
             return meal != null;
         });
+    }
+
+    public Flux<Mono<Meal>> getMealsByIds(List<String> mealsIds) {
+        return Flux.fromIterable(mealsIds).map(reactiveMealRepository::findById);
     }
 }

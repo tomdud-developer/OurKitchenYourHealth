@@ -1,16 +1,14 @@
 package com.ourkitchen.yourhealth.mealsmicroservice.controller;
 
 
-import com.ourkitchen.yourhealth.mealsmicroservice.model.Igredient;
 import com.ourkitchen.yourhealth.mealsmicroservice.model.Meal;
-import com.ourkitchen.yourhealth.mealsmicroservice.model.Substance;
 import com.ourkitchen.yourhealth.mealsmicroservice.service.MealService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.mongodb.repository.config.EnableReactiveMongoRepositories;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.util.List;
 
@@ -21,19 +19,6 @@ public class MealsController {
 
     private final MealService mealService;
 
-    @PostMapping("substances")
-    public Substance saveSubstance(@RequestBody Substance substance) {
-        return mealService.saveSubstance(substance);
-    }
-
-    @GetMapping("substances")
-    public List<Substance> getSubstances() {
-        return mealService.getAllAvailableSubstances();
-    }
-    @PostMapping("igredients")
-    public Igredient saveIgredient(@RequestBody Igredient igredient) {
-        return mealService.saveIgredient(igredient);
-    }
 
     @PostMapping()
     public ResponseEntity<Meal> saveMeal(@RequestBody Meal meal) {
@@ -45,7 +30,7 @@ public class MealsController {
         mealService.deleteMeal(mealId);
     }
 
-    @GetMapping("")
+    @GetMapping("meals")
     public Flux<Meal> getMeals() {
         return mealService.getAvailableMeals();
     }
@@ -54,6 +39,14 @@ public class MealsController {
     public Flux<Boolean> isMealsAvailable(@RequestBody List<String> mealsIds){
         return mealService.isMealsAvailable(mealsIds);
     }
+
+    @GetMapping
+    public Flux<Mono<Meal>> getMealsByIds(@RequestBody List<String> mealsIds){
+        return mealService.getMealsByIds(mealsIds);
+    }
+
+
+
 
 
 
