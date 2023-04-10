@@ -30,17 +30,17 @@ public class MealsController {
         mealService.deleteMeal(mealId);
     }
 
-    @GetMapping("meals")
+    @GetMapping()
     public Flux<Meal> getMeals() {
         return mealService.getAvailableMeals();
     }
 
-    @GetMapping("meals/is-exists")
+    @GetMapping("/is-exists")
     public Flux<Boolean> isMealsAvailable(@RequestBody List<String> mealsIds){
         return mealService.isMealsAvailable(mealsIds);
     }
 
-    @GetMapping
+    @GetMapping("/by-ids")
     public Flux<Mono<Meal>> getMealsByIds(@RequestBody List<String> mealsIds){
         return mealService.getMealsByIds(mealsIds);
     }
