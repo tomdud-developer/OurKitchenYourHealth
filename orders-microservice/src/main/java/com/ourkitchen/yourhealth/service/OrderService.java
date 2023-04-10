@@ -7,19 +7,21 @@ import com.ourkitchen.yourhealth.model.OrderOneDay;
 import com.ourkitchen.yourhealth.model.OrderStatus;
 import com.ourkitchen.yourhealth.repository.OrderOneDayRepository;
 import com.ourkitchen.yourhealth.repository.OrderRepository;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jws;
+import io.jsonwebtoken.Jwts;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Flux;
 
 import java.math.BigDecimal;
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -52,6 +54,13 @@ public class OrderService {
         //Calculating order totalPrice
         BigDecimal totalPrice = mealsServiceClient.calculateOrderPrice(mealsIds).block();
 
+        //Retrieve UserId
+        JwtAuthenticationToken jwtAuthenticationToken = (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
+        Map<String, Object> claims = jwtAuthenticationToken.getToken().getClaims();
+
+        String userId = claims.get("sub").toString();
+        if(userId == null) userId = "testClientID";
+
         List<OrderOneDay> orderOneDayList = new ArrayList<>();
         long days = 0;
 
@@ -70,6 +79,7 @@ public class OrderService {
         order.setDaysNumber(days);
         order.setTotalPrice(totalPrice);
         order.setOrderStatus(OrderStatus.CREATED_NOT_CONFIRMED);
+        order.setUserId(userId);
 
         Order savedOrder = orderRepository.save(order);
 
