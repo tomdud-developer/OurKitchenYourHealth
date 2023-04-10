@@ -1,68 +1,52 @@
 package com.ourkitchen.yourhealth.client;
 
-import com.ourkitchen.yourhealth.dto.ProcessPaymentRequestDTO;
-import feign.Feign;
-import feign.Request;
-import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.context.annotation.Bean;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ourkitchen.yourhealth.dto.PayUPaymentRequestDTO;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 
+@Service
+public class PayUClient {
 
-@FeignClient(
-        value = "payu-client",
-        url = "https://secure.snd.payu.com",
-        configuration = PayUClient.Configuration.class
-)
-public interface PayUClient {
+    @Value("${payU.process.payment.uri}")
+    private String PAYU_PAYMENT_URL;
 
-    /*
-        Problems with 302 code, OpenFeign is complicated with 302 response
-    */
-    @RequestMapping(
-            method = RequestMethod.POST,
-            headers = "Content-Type: application/json",
-            value = "/api/v2_1/orders",
-            consumes = MediaType.APPLICATION_JSON_VALUE
-    )
-    @ResponseBody
-    @ResponseStatus(HttpStatus.FOUND)
-    ResponseEntity<String> processPayment(
-            @RequestBody ProcessPaymentRequestDTO processPaymentRequest,
-            @RequestHeader(name="Authorization") String accessToken
-    );
+    public String processPayment(PayUPaymentRequestDTO payUPaymentRequestDTO, String accessToken) {
+        String redirectURL = null;
+        try {
+            OkHttpClient client = new OkHttpClient.Builder()
+                    .followRedirects(false)
+                    .followSslRedirects(false)
+                    .retryOnConnectionFailure(true)
+                    .build();
 
-    class Configuration {
-        @Bean
-        public Feign.Builder builder() {
-            Request.Options defaultOpts = new Request.Options();
-            return Feign.builder()
-                    .options(new Request.Options(
-                            defaultOpts.connectTimeoutMillis(),
-                            defaultOpts.connectTimeoutUnit(),
-                            defaultOpts.readTimeout(),
-                            defaultOpts.connectTimeoutUnit(),
-                            false // Disable follow redirects.
-                    ));
+            ObjectMapper objectMapper = new ObjectMapper();
+            String processPaymentRequestJsonBody = objectMapper.writeValueAsString(payUPaymentRequestDTO);
+            RequestBody requestBody = RequestBody.create(processPaymentRequestJsonBody, okhttp3.MediaType.parse("application/json"));
+
+            Request request = new Request.Builder()
+                    .url(PAYU_PAYMENT_URL)
+                    .header("Authorization", accessToken)
+                    .method("POST", requestBody)
+                    .build();
+
+            Response response = client.newCall(request).execute();
+            String stringResponse = response.body().string();
+            JsonNode responseJson = objectMapper.readTree(stringResponse);
+
+            redirectURL = responseJson.get("redirectUri").asText();
+
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
+
+        return redirectURL;
     }
-
-
-
-    @RequestMapping(
-            method = RequestMethod.POST,
-            headers = "Content-Type: application/x-www-form-urlencoded",
-            params = { "grant_type", "client_id", "client_secret", "email" },
-            value = "/pl/standard/user/oauth/authorize",
-            produces = "application/json")
-    @ResponseBody
-    String getAccessToken(@RequestParam String grant_type,
-                          @RequestParam String client_id,
-                          @RequestParam String client_secret,
-                          @RequestParam String email
-    );
-
 }
