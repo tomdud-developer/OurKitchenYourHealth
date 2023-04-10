@@ -26,6 +26,9 @@ public class Order {
     private Long daysNumber;
     @DocumentReference(lazy=true)
     private List<OrderOneDay> orderOneDays;
-
     private BigDecimal totalPrice;
+
+    private Boolean isConfirmed;
+
+    private OrderStatus orderStatus;
 }

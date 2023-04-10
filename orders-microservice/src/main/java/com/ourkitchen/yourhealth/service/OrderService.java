@@ -1,8 +1,10 @@
 package com.ourkitchen.yourhealth.service;
 
 import com.ourkitchen.yourhealth.client.MealsServiceClient;
+import com.ourkitchen.yourhealth.exeption.OrderNotFoundException;
 import com.ourkitchen.yourhealth.model.Order;
 import com.ourkitchen.yourhealth.model.OrderOneDay;
+import com.ourkitchen.yourhealth.model.OrderStatus;
 import com.ourkitchen.yourhealth.repository.OrderOneDayRepository;
 import com.ourkitchen.yourhealth.repository.OrderRepository;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +19,7 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -31,17 +34,20 @@ public class OrderService {
     private final MealsServiceClient mealsServiceClient;
 
     @Transactional
-    public Order createOrder(Order order) throws Exception{
+    public Order createOrder(Order order) throws IllegalStateException {
 
         //Checking meals ids
         List<String> mealsIds = order.getOrderOneDays().stream().map(OrderOneDay::getMealsIds).flatMap(Collection::stream).toList();
         Flux<Boolean> booleanFlux = mealsServiceClient.areMealsExists(mealsIds);
 
-        booleanFlux.subscribe(booleanSignal -> {
-            System.out.println(booleanSignal.booleanValue());
-            if(!booleanSignal)
-                throw new RuntimeException("Bad meals ids");
-        });
+        try {
+            booleanFlux.subscribe(booleanSignal -> {
+                if(!booleanSignal) throw new IllegalStateException("Bad meal id!");
+            });
+        } catch (IllegalStateException exception) {
+            throw new IllegalStateException(exception.getMessage());
+        }
+
 
         //Calculating order totalPrice
         BigDecimal totalPrice = mealsServiceClient.calculateOrderPrice(mealsIds).block();
@@ -63,6 +69,7 @@ public class OrderService {
         order.setOrderOneDays(orderOneDayList);
         order.setDaysNumber(days);
         order.setTotalPrice(totalPrice);
+        order.setOrderStatus(OrderStatus.CREATED_NOT_CONFIRMED);
 
         Order savedOrder = orderRepository.save(order);
 
@@ -70,6 +77,22 @@ public class OrderService {
 
         return savedOrder;
     }
+
+    @Transactional
+    public String confirmOrder(String orderId) throws OrderNotFoundException {
+        Optional<Order> orderOptional = orderRepository.findById(orderId);
+        orderOptional.ifPresentOrElse(order -> {
+            log.info("Confirm order with id: {}", orderId);
+            order.setIsConfirmed(Boolean.TRUE);
+            order.setOrderStatus(OrderStatus.WAITING_FOR_PAYMENT);
+        }, () -> {
+            throw new OrderNotFoundException(orderId);
+        });
+
+        return String.format("Order with number %s confirmed, order status is %s", orderId, OrderStatus.WAITING_FOR_PAYMENT);
+    }
+
+
 
 
 }

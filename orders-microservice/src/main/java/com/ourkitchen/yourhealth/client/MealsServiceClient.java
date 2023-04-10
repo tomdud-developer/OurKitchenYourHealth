@@ -21,10 +21,11 @@ public class MealsServiceClient {
 
     private final WebClient webClient;
 
-    @Value("${meal-client-uris.is-exists}")
-    private final URI uriIsExists;
+    @Value("${meal.client.uris.is-exists}")
+    private URI uriIsExists;
+
     @Value("${meal.client.uris.calculate-order-price}")
-    private final URI uriCalculateOrderPrice;
+    private URI uriCalculateOrderPrice;
 
     public Flux<Boolean> areMealsExists(List<String> mealsIds) {
         log.info("Checking mealsIds");
