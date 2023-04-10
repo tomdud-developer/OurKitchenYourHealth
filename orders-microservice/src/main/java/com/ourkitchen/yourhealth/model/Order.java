@@ -31,4 +31,6 @@ public class Order {
     private Boolean isConfirmed;
 
     private OrderStatus orderStatus;
+
+    private OrderAddress orderAddress;
 }
