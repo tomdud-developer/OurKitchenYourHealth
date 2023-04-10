@@ -1,5 +1,6 @@
 package com.ourkitchen.yourhealth.controller;
 
+import com.ourkitchen.yourhealth.dto.OrderInfoDTO;
 import com.ourkitchen.yourhealth.model.Order;
 import com.ourkitchen.yourhealth.service.OrderService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -25,6 +26,11 @@ public class OrderController {
     @PostMapping("confirm/{orderId}")
     public ResponseEntity<String> confirmOrder(@PathVariable String orderId) {
         return ResponseEntity.ok(orderService.confirmOrder(orderId));
+    }
+
+    @GetMapping("{orderId}")
+    public ResponseEntity<Order> getOrderInfo(@PathVariable String orderId) {
+        return ResponseEntity.ok(orderService.getOrderInfo(orderId));
     }
 
 

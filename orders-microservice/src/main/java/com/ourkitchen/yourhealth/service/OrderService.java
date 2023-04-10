@@ -93,6 +93,15 @@ public class OrderService {
     }
 
 
+    @Transactional
+    public Order getOrderInfo(String orderId) {
+        Optional<Order> orderOptional = orderRepository.findById(orderId);
 
+        if(orderOptional.isEmpty())
+            throw new OrderNotFoundException(orderId);
 
+        Order foundOrder = orderOptional.get();
+
+        return foundOrder;
+    }
 }
