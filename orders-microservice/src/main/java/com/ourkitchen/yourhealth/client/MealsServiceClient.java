@@ -2,19 +2,15 @@ package com.ourkitchen.yourhealth.client;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpMethod;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.oauth2.client.OAuth2AuthorizeRequest;
-import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
-import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
-import org.springframework.security.oauth2.core.OAuth2AccessToken;
-import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import org.springframework.http.HttpStatus;
 
+import java.math.BigDecimal;
 import java.net.URI;
 import java.util.List;
 
@@ -24,31 +20,49 @@ import java.util.List;
 public class MealsServiceClient {
 
     private final WebClient webClient;
-    //private final OAuth2AuthorizedClientService authorizedClientService;
 
-    URI uri = URI.create("http://localhost:8080/meals-microservice/api/v1/meals/meals/is-exists");
+    @Value("${meal-client-uris.is-exists}")
+    private final URI uriIsExists;
+    @Value("${meal.client.uris.calculate-order-price}")
+    private final URI uriCalculateOrderPrice;
 
     public Flux<Boolean> areMealsExists(List<String> mealsIds) {
         log.info("Checking mealsIds");
 
         Flux<Boolean> booleanFlux = webClient.method(HttpMethod.GET)
-                .uri(uri)
+                .uri(uriIsExists)
                 .bodyValue(mealsIds)
                 .retrieve()
-/*                .onStatus(HttpStatus::is4xxClientError, (clientResponse -> {
+                .onStatus(HttpStatusCode::is4xxClientError, clientResponse -> {
                     log.info("Status code : {}", clientResponse.statusCode().value());
-                    throw new RuntimeException("error");
-                }))
-                .onStatus(HttpStatus::is5xxServerError, (clientResponse -> {
-                    log.info("Status code : {}", clientResponse.statusCode().value());
-                    throw new RuntimeException("error");
-                }))
-                .onStatus(HttpStatus::is2xxSuccessful, (clientResponse -> {
-                    log.info("Status code : {}", clientResponse.statusCode().value());
-                    throw new RuntimeException("good");
-                }))*/
+                    return Mono.error(new RuntimeException("Client error"));
+                })
+                .onStatus(HttpStatusCode::is5xxServerError, response -> {
+                    log.info("Status code: {}", response.statusCode().value());
+                    return Mono.error(new RuntimeException("Server error"));
+                })
                 .bodyToFlux(Boolean.class);
         booleanFlux.subscribe(x -> log.info("{}", x));
+        return booleanFlux.log();
+    }
+
+    public Mono<BigDecimal> calculateOrderPrice(List<String> mealsIds) {
+        log.info("Calculate order price");
+
+        Mono<BigDecimal> booleanFlux = webClient.method(HttpMethod.GET)
+                .uri(uriCalculateOrderPrice)
+                .bodyValue(mealsIds)
+                .retrieve()
+                .onStatus(HttpStatusCode::is4xxClientError, clientResponse -> {
+                    log.info("Status code : {}", clientResponse.statusCode().value());
+                    return Mono.error(new RuntimeException("Client error"));
+                })
+                .onStatus(HttpStatusCode::is5xxServerError, response -> {
+                    log.info("Status code: {}", response.statusCode().value());
+                    return Mono.error(new RuntimeException("Server error"));
+                })
+                .bodyToMono(BigDecimal.class);
+
         return booleanFlux.log();
     }
 

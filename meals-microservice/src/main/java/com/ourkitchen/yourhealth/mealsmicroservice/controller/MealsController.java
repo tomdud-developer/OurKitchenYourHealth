@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @RestController
@@ -45,8 +46,10 @@ public class MealsController {
         return mealService.getMealsByIds(mealsIds);
     }
 
-
-
+    @GetMapping("/calculate-order-price")
+    public Mono<BigDecimal> calculateOrderPrice(@RequestBody List<String> mealsIds){
+        return mealService.calculateOrderPrice(mealsIds);
+    }
 
 
 

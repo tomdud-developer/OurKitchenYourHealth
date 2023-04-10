@@ -9,11 +9,13 @@ import com.ourkitchen.yourhealth.mealsmicroservice.repository.ReactiveMealReposi
 import com.ourkitchen.yourhealth.mealsmicroservice.repository.SubstanceRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.reactivestreams.Publisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -107,5 +109,13 @@ public class MealService {
 
     public Flux<Mono<Meal>> getMealsByIds(List<String> mealsIds) {
         return Flux.fromIterable(mealsIds).map(reactiveMealRepository::findById);
+    }
+
+    public Mono<BigDecimal> calculateOrderPrice(List<String> mealsIds) {
+        Flux<Meal> mealFlux = Flux.fromIterable(mealsIds).flatMap(reactiveMealRepository::findById);
+        Flux<BigDecimal> bigDecimalFlux = mealFlux.map(Meal::getPrice);
+        Mono<BigDecimal> price = bigDecimalFlux.reduce(BigDecimal::add);
+
+        return price;
     }
 }

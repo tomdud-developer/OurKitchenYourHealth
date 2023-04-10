@@ -29,6 +29,7 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 import java.math.BigDecimal;
@@ -239,7 +240,7 @@ public class MealServiceTest {
         meal3.setId("235235%@#%@#2342343446$%#$");
         List<String> mealsIds = Stream.of(meal1, meal2, meal3).map(Meal::getId).toList();
 
-        URI uri = URI.create("/api/v1/meals/meals/is-exists");
+        URI uri = URI.create("/api/v1/meals/is-exists");
 
         Flux<Boolean> booleanFlux = webTestClient.method(HttpMethod.GET)
                 .uri(uri)
@@ -257,5 +258,29 @@ public class MealServiceTest {
                 .expectNextCount(0)
                 .verifyComplete();
 
+    }
+
+    @Test
+    void calculateOrderPrice() {
+        //given
+        List<String> mealsIds = Stream.of(meal1, meal2).map(Meal::getId).toList();
+        BigDecimal totalPrice = meal1.getPrice().add(meal2.getPrice());
+
+        URI uri = URI.create("/api/v1/meals/calculate-order-price");
+
+        Mono<BigDecimal> bigDecimalMono = webTestClient.method(HttpMethod.GET)
+                .uri(uri)
+                .bodyValue(mealsIds)
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .returnResult(BigDecimal.class)
+                .getResponseBody()
+                .next();
+
+        StepVerifier.create(bigDecimalMono)
+                .assertNext(x -> Assertions.assertEquals(x, totalPrice))
+                .expectNextCount(0)
+                .verifyComplete();
     }
 }

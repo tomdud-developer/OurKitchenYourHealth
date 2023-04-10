@@ -43,10 +43,11 @@ public class OrderService {
                 throw new RuntimeException("Bad meals ids");
         });
 
+        //Calculating order totalPrice
+        BigDecimal totalPrice = mealsServiceClient.calculateOrderPrice(mealsIds).block();
 
         List<OrderOneDay> orderOneDayList = new ArrayList<>();
         long days = 0;
-        BigDecimal totalPrice = BigDecimal.ZERO;
 
         for(OrderOneDay day : order.getOrderOneDays()) {
             OrderOneDay orderOneDay = OrderOneDay.builder()
@@ -56,7 +57,6 @@ public class OrderService {
                     .build();
             OrderOneDay savedOrderOneDay = orderOneDayRepository.save(orderOneDay);
             orderOneDayList.add(savedOrderOneDay);
-           //totalPrice.add()
             days++;
         };
 
@@ -70,4 +70,6 @@ public class OrderService {
 
         return savedOrder;
     }
+
+
 }
