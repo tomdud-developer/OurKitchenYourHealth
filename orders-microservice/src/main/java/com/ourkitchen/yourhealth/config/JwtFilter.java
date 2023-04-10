@@ -14,8 +14,8 @@ import java.io.IOException;
 import java.security.Principal;
 import java.util.Base64;
 
-@Component
-@Order(1)
+//@Component
+//@Order(1)
 public class JwtFilter implements Filter {
 
     private static final String AUTH_HEADER = "Authorization";

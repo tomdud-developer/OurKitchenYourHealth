@@ -37,9 +37,9 @@ public class OrderService {
         List<String> mealsIds = order.getOrderOneDays().stream().map(OrderOneDay::getMealsIds).flatMap(Collection::stream).toList();
         Flux<Boolean> booleanFlux = mealsServiceClient.areMealsExists(mealsIds);
 
-        booleanFlux.doOnEach(booleanSignal -> {
-            System.out.println(booleanSignal.get().booleanValue());
-            if(!booleanSignal.get().booleanValue())
+        booleanFlux.subscribe(booleanSignal -> {
+            System.out.println(booleanSignal.booleanValue());
+            if(!booleanSignal)
                 throw new RuntimeException("Bad meals ids");
         });
 

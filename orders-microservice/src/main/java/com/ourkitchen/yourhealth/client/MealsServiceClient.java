@@ -24,26 +24,16 @@ import java.util.List;
 public class MealsServiceClient {
 
     private final WebClient webClient;
-    private final OAuth2AuthorizedClientService authorizedClientService;
+    //private final OAuth2AuthorizedClientService authorizedClientService;
 
     URI uri = URI.create("http://localhost:8080/meals-microservice/api/v1/meals/meals/is-exists");
 
-    public Flux<Boolean> areMealsExists(List<String> meaalsIds) {
+    public Flux<Boolean> areMealsExists(List<String> mealsIds) {
         log.info("Checking mealsIds");
-        System.out.println("Checking mealsIds");
-        //Jwt jwt = (Jwt) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        //OAuth2AuthorizedClient authorizedClient = authorizedClientService.loadAuthorizedClient("order-microservice", "order-microservice");
-        OAuth2AuthorizeRequest oAuth2AuthorizeRequest =
-                OAuth2AuthorizeRequest.withClientRegistrationId("order-microservice")
-                        .principal("postman-1")
-                        .build();
-       // var accessToken = authorizedClient.getAccessToken();
-        //String tokenValue = accessToken.getTokenValue();
 
         Flux<Boolean> booleanFlux = webClient.method(HttpMethod.GET)
                 .uri(uri)
-                .bodyValue(meaalsIds)
-               // .headers(header -> header.setBearerAuth(tokenValue))
+                .bodyValue(mealsIds)
                 .retrieve()
 /*                .onStatus(HttpStatus::is4xxClientError, (clientResponse -> {
                     log.info("Status code : {}", clientResponse.statusCode().value());
@@ -59,8 +49,6 @@ public class MealsServiceClient {
                 }))*/
                 .bodyToFlux(Boolean.class);
         booleanFlux.subscribe(x -> log.info("{}", x));
-
-        booleanFlux.doOnEach(booleanSignal -> System.out.println(booleanSignal.get()));
         return booleanFlux.log();
     }
 
