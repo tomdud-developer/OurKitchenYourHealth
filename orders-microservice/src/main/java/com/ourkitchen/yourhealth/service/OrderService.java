@@ -85,6 +85,7 @@ public class OrderService {
             log.info("Confirm order with id: {}", orderId);
             order.setIsConfirmed(Boolean.TRUE);
             order.setOrderStatus(OrderStatus.WAITING_FOR_PAYMENT);
+            orderRepository.save(order);
         }, () -> {
             throw new OrderNotFoundException(orderId);
         });

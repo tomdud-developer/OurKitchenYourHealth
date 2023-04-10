@@ -10,5 +10,6 @@ public class ProcessPaymentRequestDTO {
 
     private String clientId;
     private String orderId;
+    private String currencyCode;
 
 }

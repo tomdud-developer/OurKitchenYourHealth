@@ -4,7 +4,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ourkitchen.yourhealth.client.OrderMicroserviceClient;
 import com.ourkitchen.yourhealth.client.PayUClient;
+import com.ourkitchen.yourhealth.dto.OrderInfoDTO;
 import com.ourkitchen.yourhealth.dto.PayUPaymentRequestDTO;
 import com.ourkitchen.yourhealth.dto.ProcessPaymentRequestDTO;
 import com.ourkitchen.yourhealth.util.Secrets;
@@ -26,8 +28,10 @@ import java.util.Map;
 public class PaymentService {
 
     private final PayUClient payUClient;
+    private final OrderMicroserviceClient orderMicroserviceClient;
 
     private final String PAYU_PAYMENT_URL = "https://secure.snd.payu.com/api/v2_1/orders";
+
 
     public String processPayment(ProcessPaymentRequestDTO processPaymentRequest) throws HttpClientErrorException.Unauthorized {
          /*
@@ -35,14 +39,18 @@ public class PaymentService {
          */
         String accessToken = "Bearer " + getAccessToken();
         String clientId = processPaymentRequest.getClientId();
+        String orderId = processPaymentRequest.getOrderId();
+
 
         /*
             Based on clientId retrieve information about client, firstname and email
             For now lets define them
         */
+        OrderInfoDTO orderInfoDTO = orderMicroserviceClient.getOrderInfo(orderId).getBody();
 
         PayUPaymentRequestDTO payUPaymentRequestDTO = PayUPaymentRequestDTO.builder()
-
+                .merchantPosId(Secrets.NONPRODUCTION_SANDBOX_PAYU_POS_ID.toString())
+                .currencyCode("PLN")
                 .build();
 
 
