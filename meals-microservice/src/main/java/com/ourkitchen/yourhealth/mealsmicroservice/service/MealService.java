@@ -1,9 +1,9 @@
 package com.ourkitchen.yourhealth.mealsmicroservice.service;
 
-import com.ourkitchen.yourhealth.mealsmicroservice.model.Igredient;
+import com.ourkitchen.yourhealth.mealsmicroservice.model.Ingredient;
 import com.ourkitchen.yourhealth.mealsmicroservice.model.Meal;
 import com.ourkitchen.yourhealth.mealsmicroservice.model.Substance;
-import com.ourkitchen.yourhealth.mealsmicroservice.repository.IgredientRepository;
+import com.ourkitchen.yourhealth.mealsmicroservice.repository.IngredientRepository;
 import com.ourkitchen.yourhealth.mealsmicroservice.repository.MealRepository;
 import com.ourkitchen.yourhealth.mealsmicroservice.repository.ReactiveMealRepository;
 import com.ourkitchen.yourhealth.mealsmicroservice.repository.SubstanceRepository;
@@ -23,7 +23,7 @@ import java.util.Optional;
 @Slf4j
 public class MealService {
 
-    private final IgredientRepository igredientRepository;
+    private final IngredientRepository ingredientRepository;
     private final MealRepository mealRepository;
 
     private final ReactiveMealRepository reactiveMealRepository;
@@ -42,19 +42,18 @@ public class MealService {
     }
 
     @Transactional
-    public Igredient saveIgredient(Igredient igredient) {
-        String substanceId = igredient.getSubstance().getId();
+    public Ingredient saveIgredient(Ingredient ingredient) {
+        String substanceId = ingredient.getSubstance().getId();
 
         if(substanceId == null) throw new RuntimeException("You are not provide substance id");
-        if(igredient.getWeight() == null) throw new RuntimeException("You are not provide weight");
-
+        if(ingredient.getWeight() == null) throw new RuntimeException("You are not provide weight");
 
         Optional<Substance> optionalSubstance = substanceRepository.findById(substanceId);
-        optionalSubstance.ifPresentOrElse(igredient::setSubstance,
-                () -> {throw new RuntimeException("You are not provide correct id");}
+        optionalSubstance.ifPresentOrElse(ingredient::setSubstance,
+                () -> {throw new RuntimeException("You are not provide correct ingredient id");}
         );
 
-        return igredientRepository.save(igredient);
+        return ingredientRepository.save(ingredient);
     }
 
     @Transactional
@@ -64,14 +63,14 @@ public class MealService {
 
     @Transactional
     public Meal saveMeal(Meal meal) {
-        List<Igredient> igredients = new ArrayList<>();
-        meal.getIgredients().forEach((igredient) -> {
+        List<Ingredient> ingredients = new ArrayList<>();
+        meal.getIngredients().forEach((igredient) -> {
             Substance substance = igredient.getSubstance();
             if(substance == null) throw new RuntimeException("You didn't provide substance");
-            igredients.add(this.saveIgredient(igredient));
+            ingredients.add(this.saveIgredient(igredient));
         });
 
-        meal.setIgredients(igredients);
+        meal.setIngredients(ingredients);
 
         return mealRepository.save(meal);
     }
@@ -85,8 +84,8 @@ public class MealService {
     public void deleteMeal(String mealId) {
         Optional<Meal> optionalMeal = mealRepository.findById(mealId);
         optionalMeal.ifPresentOrElse((meal) -> {
-            meal.getIgredients()
-                    .forEach(igredient -> igredientRepository.deleteById(
+            meal.getIngredients()
+                    .forEach(igredient -> ingredientRepository.deleteById(
                             igredient.getId()
                     ));
         },() -> {

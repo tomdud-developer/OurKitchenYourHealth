@@ -1,33 +1,25 @@
 package com.ourkitchen.yourhealth.mealsmicroservice.service;
 
 import com.ourkitchen.yourhealth.mealsmicroservice.MealsMicroserviceApplication;
-import com.ourkitchen.yourhealth.mealsmicroservice.model.Igredient;
+import com.ourkitchen.yourhealth.mealsmicroservice.model.Ingredient;
 import com.ourkitchen.yourhealth.mealsmicroservice.model.Meal;
 import com.ourkitchen.yourhealth.mealsmicroservice.model.MealType;
 import com.ourkitchen.yourhealth.mealsmicroservice.model.Substance;
-import com.ourkitchen.yourhealth.mealsmicroservice.repository.IgredientRepository;
+import com.ourkitchen.yourhealth.mealsmicroservice.repository.IngredientRepository;
 import com.ourkitchen.yourhealth.mealsmicroservice.repository.MealRepository;
 import com.ourkitchen.yourhealth.mealsmicroservice.repository.ReactiveMealRepository;
 import com.ourkitchen.yourhealth.mealsmicroservice.repository.SubstanceRepository;
-import org.apache.http.client.utils.URIBuilder;
 import org.junit.jupiter.api.*;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
-import org.springframework.data.mongodb.repository.config.EnableReactiveMongoRepositories;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MockMvcBuilder;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -42,11 +34,10 @@ import reactor.test.StepVerifier;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.net.URI;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Stream;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import static org.junit.jupiter.api.Assertions.*;
+
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
 
@@ -85,7 +76,7 @@ public class MealServiceTest {
     private MealRepository mealRepository;
 
     @Autowired
-    private IgredientRepository igredientRepository;
+    private IngredientRepository ingredientRepository;
 
     @Autowired
     private SubstanceRepository substanceRepository;
@@ -94,10 +85,10 @@ public class MealServiceTest {
     private Substance substance1;
     private Substance substance2;
     private Substance substance3;
-    private Igredient igredient1_1;
-    private Igredient igredient1_2;
-    private Igredient igredient2_2;
-    private Igredient igredient2_3;
+    private Ingredient ingredient1_1;
+    private Ingredient ingredient1_2;
+    private Ingredient ingredient2_2;
+    private Ingredient ingredient2_3;
 
     private Meal meal1;
     private Meal meal2;
@@ -143,41 +134,41 @@ public class MealServiceTest {
         substance2 = substanceRepository.save(substance2);
         substance3 = substanceRepository.save(substance3);
 
-        igredient1_1 = Igredient.builder()
+        ingredient1_1 = Ingredient.builder()
                 .id("igredient1_1_id")
                 .substance(substance1)
                 .weight(new BigDecimal("40.5"))
                 .build();
 
-        igredient1_2 = Igredient.builder()
+        ingredient1_2 = Ingredient.builder()
                 .id("igredient1_2_id")
                 .substance(substance2)
                 .weight(new BigDecimal("54.5"))
                 .build();
 
-        igredient2_2 = Igredient.builder()
+        ingredient2_2 = Ingredient.builder()
                 .id("igredient2_2_id")
                 .substance(substance2)
                 .weight(new BigDecimal("40.5"))
                 .build();
 
-        igredient2_3 = Igredient.builder()
+        ingredient2_3 = Ingredient.builder()
                 .id("igredient2_3_id")
                 .substance(substance3)
                 .weight(new BigDecimal("90.4"))
                 .build();
 
-        igredient1_1 = igredientRepository.save(igredient1_1);
-        igredient1_2 = igredientRepository.save(igredient1_2);
-        igredient2_2 = igredientRepository.save(igredient2_2);
-        igredient2_3 = igredientRepository.save(igredient2_3);
+        ingredient1_1 = ingredientRepository.save(ingredient1_1);
+        ingredient1_2 = ingredientRepository.save(ingredient1_2);
+        ingredient2_2 = ingredientRepository.save(ingredient2_2);
+        ingredient2_3 = ingredientRepository.save(ingredient2_3);
 
         meal1 = Meal.builder()
                 .id("meal1_id")
                 .type(MealType.BREAKFAST)
                 .name("FirstMeal")
                 .price(new BigDecimal("32.44"))
-                .igredients(List.of(igredient1_1, igredient1_2))
+                .ingredients(List.of(ingredient1_1, ingredient1_2))
                 .build();
 
         meal2 = Meal.builder()
@@ -185,7 +176,7 @@ public class MealServiceTest {
                 .type(MealType.DINNER)
                 .name("SecondMeal")
                 .price(new BigDecimal("345.44"))
-                .igredients(List.of(igredient2_2, igredient2_3))
+                .ingredients(List.of(ingredient2_2, ingredient2_3))
                 .build();
 
         meal1 = mealRepository.save(meal2);
@@ -195,7 +186,7 @@ public class MealServiceTest {
     @AfterEach
     void tearDown() {
         mealRepository.deleteAll();
-        igredientRepository.deleteAll();;
+        ingredientRepository.deleteAll();;
         substanceRepository.deleteAll();
     }
 
@@ -206,7 +197,7 @@ public class MealServiceTest {
                 .type(MealType.SUPPER)
                 .name("NewMeal")
                 .price(new BigDecimal("33.24"))
-                .igredients(List.of(igredient2_2, igredient2_3, igredient1_1))
+                .ingredients(List.of(ingredient2_2, ingredient2_3, ingredient1_1))
                 .build();
 
         MvcResult mvcResult = this.mockMvc.perform(post("/api/v1/meals")

@@ -1,24 +1,19 @@
 package com.ourkitchen.yourhealth.mealsmicroservice;
 
-import com.ourkitchen.yourhealth.mealsmicroservice.model.Igredient;
+import com.ourkitchen.yourhealth.mealsmicroservice.model.Ingredient;
 import com.ourkitchen.yourhealth.mealsmicroservice.model.Meal;
 import com.ourkitchen.yourhealth.mealsmicroservice.model.MealType;
 import com.ourkitchen.yourhealth.mealsmicroservice.model.Substance;
-import com.ourkitchen.yourhealth.mealsmicroservice.repository.IgredientRepository;
+import com.ourkitchen.yourhealth.mealsmicroservice.repository.IngredientRepository;
 import com.ourkitchen.yourhealth.mealsmicroservice.repository.MealRepository;
 import com.ourkitchen.yourhealth.mealsmicroservice.repository.SubstanceRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Profile;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 import org.springframework.data.mongodb.repository.config.EnableReactiveMongoRepositories;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.ArrayList;
 import java.util.Arrays;
 
 @SpringBootApplication
@@ -34,7 +29,7 @@ public class MealsMicroserviceApplication {
 
 	//@Autowired
 	//@Bean
-	public String mealTest(MealRepository mealRepository, IgredientRepository igredientRepository, SubstanceRepository substanceRepository) {
+	public String mealTest(MealRepository mealRepository, IngredientRepository ingredientRepository, SubstanceRepository substanceRepository) {
 		Substance substance1 = Substance.builder()
 				.name("yoghurt")
 				.fat(new BigDecimal("0.4"))
@@ -58,25 +53,25 @@ public class MealsMicroserviceApplication {
 
 
 
-		Igredient igredient1 = Igredient.builder()
+		Ingredient ingredient1 = Ingredient.builder()
 				.weight(new BigDecimal("200"))
 				.substance(substance1)
 				.build();
 
-		Igredient igredient2 = Igredient.builder()
+		Ingredient ingredient2 = Ingredient.builder()
 				.weight(new BigDecimal("50"))
 				.substance(substance2)
 				.build();
 
-		igredient1 = igredientRepository.save(igredient1);
-		igredient2 = igredientRepository.save(igredient2);
+		ingredient1 = ingredientRepository.save(ingredient1);
+		ingredient2 = ingredientRepository.save(ingredient2);
 
 
 		Meal meal = Meal.builder()
 				.name("Cereals with yoghurt")
 				.price(new BigDecimal("8.0"))
 				.type(MealType.BREAKFAST)
-				.igredients(Arrays.asList(igredient1, igredient2))
+				.ingredients(Arrays.asList(ingredient1, ingredient2))
 				.build();
 
 		mealRepository.save(meal);
