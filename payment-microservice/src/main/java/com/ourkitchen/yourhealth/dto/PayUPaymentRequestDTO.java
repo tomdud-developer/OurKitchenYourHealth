@@ -19,8 +19,13 @@ public class PayUPaymentRequestDTO {
     private BuyerDTO buyer;
     private List<ProductDTO> products;
 
+    private String extOrderId;
+
+    private String visibleDescription;
+
 
     @Data
+    @Builder
     public static class BuyerDTO {
         private String email;
         private String phone;
