@@ -1,13 +1,9 @@
 package com.ourkitchen.yourhealth.client;
 
-import com.ourkitchen.yourhealth.dto.ProcessPaymentRequestDTO;
 import feign.Feign;
 import feign.Request;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.context.annotation.Bean;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -19,21 +15,6 @@ import org.springframework.web.bind.annotation.*;
 )
 public interface PayUAuthClient {
 
-    /*
-        Problems with 302 code, OpenFeign is complicated with 302 response
-    */
-    @RequestMapping(
-            method = RequestMethod.POST,
-            headers = "Content-Type: application/json",
-            value = "/api/v2_1/orders",
-            consumes = MediaType.APPLICATION_JSON_VALUE
-    )
-    @ResponseBody
-    @ResponseStatus(HttpStatus.FOUND)
-    ResponseEntity<String> processPayment(
-            @RequestBody ProcessPaymentRequestDTO processPaymentRequest,
-            @RequestHeader(name="Authorization") String accessToken
-    );
 
     class Configuration {
         @Bean
@@ -64,5 +45,23 @@ public interface PayUAuthClient {
                           @RequestParam String client_secret,
                           @RequestParam String email
     );
+
+        /*
+        Problems with 302 code, OpenFeign is complicated with 302 response
+    */
+/*
+    @RequestMapping(
+            method = RequestMethod.POST,
+            headers = "Content-Type: application/json",
+            value = "/api/v2_1/orders",
+            consumes = MediaType.APPLICATION_JSON_VALUE
+    )
+    @ResponseBody
+    @ResponseStatus(HttpStatus.FOUND)
+    ResponseEntity<String> processPayment(
+            @RequestBody ProcessPaymentRequestDTO processPaymentRequest,
+            @RequestHeader(name="Authorization") String accessToken
+    );
+*/
 
 }

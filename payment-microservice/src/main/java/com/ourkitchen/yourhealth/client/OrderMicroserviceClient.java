@@ -2,7 +2,6 @@ package com.ourkitchen.yourhealth.client;
 
 import com.ourkitchen.yourhealth.config.OAuth2FeignInterceptor;
 import com.ourkitchen.yourhealth.dto.OrderInfoDTO;
-import com.ourkitchen.yourhealth.dto.ProcessPaymentRequestDTO;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;

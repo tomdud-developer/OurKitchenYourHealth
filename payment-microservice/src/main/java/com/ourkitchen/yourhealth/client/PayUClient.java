@@ -19,8 +19,9 @@ public class PayUClient {
     private String PAYU_PAYMENT_URL;
 
     public String processPayment(PayUPaymentRequestDTO payUPaymentRequestDTO, String accessToken) {
-        String redirectURL = null;
+
         try {
+            String redirectURL = null;
             OkHttpClient client = new OkHttpClient.Builder()
                     .followRedirects(false)
                     .followSslRedirects(false)
@@ -42,11 +43,11 @@ public class PayUClient {
             JsonNode responseJson = objectMapper.readTree(stringResponse);
 
             redirectURL = responseJson.get("redirectUri").asText();
-
+            return redirectURL;
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
 
-        return redirectURL;
+
     }
 }

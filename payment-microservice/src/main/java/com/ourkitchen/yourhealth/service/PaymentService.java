@@ -8,7 +8,6 @@ import com.ourkitchen.yourhealth.client.PayUAuthClient;
 import com.ourkitchen.yourhealth.client.PayUClient;
 import com.ourkitchen.yourhealth.dto.OrderInfoDTO;
 import com.ourkitchen.yourhealth.dto.PayUPaymentRequestDTO;
-import com.ourkitchen.yourhealth.dto.ProcessPaymentRequestDTO;
 import com.ourkitchen.yourhealth.util.Secrets;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -33,12 +32,10 @@ public class PaymentService {
 
 
 
-    public String processPayment(ProcessPaymentRequestDTO processPaymentRequest) throws HttpClientErrorException.Unauthorized {
+    public String processPayment(String orderId) throws HttpClientErrorException.Unauthorized {
         /*
             Based on openID retrieve information about client, firstname and email
         */
-        String orderId = processPaymentRequest.getOrderId();
-
         Map<String, Object> claims = retrieveAuthData();
         String userId = claims.get("sub").toString();
         String email = claims.get("email").toString();
