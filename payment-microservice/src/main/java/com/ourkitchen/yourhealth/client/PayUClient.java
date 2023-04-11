@@ -3,6 +3,8 @@ package com.ourkitchen.yourhealth.client;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ourkitchen.yourhealth.dto.PayUPaymentRequestDTO;
+import com.ourkitchen.yourhealth.dto.PaymentRequestDTO;
+import io.micrometer.observation.annotation.Observed;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
@@ -13,12 +15,14 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 
 @Service
-public class PayUClient {
+public class PayUClient implements PaymentInterface {
 
     @Value("${payU.process.payment.uri}")
     private String PAYU_PAYMENT_URL;
 
-    public String processPayment(PayUPaymentRequestDTO payUPaymentRequestDTO, String accessToken) {
+    @Override
+    public String processPayment(PaymentRequestDTO paymentRequestDTO, String accessToken) {
+        PayUPaymentRequestDTO payUPaymentRequestDTO = (PayUPaymentRequestDTO) paymentRequestDTO;
 
         try {
             String redirectURL = null;
@@ -50,4 +54,5 @@ public class PayUClient {
 
 
     }
+
 }

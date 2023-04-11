@@ -28,6 +28,7 @@
         <micrometer.version>1.10.5</micrometer.version>
         <keycloak_adapter.version>21.0.2</keycloak_adapter.version>
         <openfeign.version>12.2</openfeign.version>
+        <spring-kafka.version>3.0.4</spring-kafka.version>
     </properties>
 
     <modules>
@@ -160,7 +161,11 @@
                 <artifactId>spring-cloud-starter-oauth2</artifactId>
                 <version>2.2.5.RELEASE</version>
             </dependency>
-
+            <dependency>
+                <groupId>org.springframework.kafka</groupId>
+                <artifactId>spring-kafka</artifactId>
+                <version>${spring-kafka.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -170,7 +175,6 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
-
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -181,7 +185,6 @@
             </plugin>
             <plugin>
                 <artifactId>maven-surefire-plugin</artifactId>
-
             </plugin>
         </plugins>
     </build>
