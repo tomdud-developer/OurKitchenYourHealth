@@ -14,6 +14,11 @@ spring:
         provider:
           keycloak:
             token-uri: http://localhost:8180/auth/realms/ourkitchen-yourhealth/protocol/openid-connect/token
+  kafka:
+    bootstrap-servers: localhost:9092
+message:
+    topic:
+      name: payment_status
 management:
   tracing:
     sampling:
@@ -25,6 +30,8 @@ payU:
   process:
     payment:
       uri: https://secure.snd.payu.com/api/v2_1/orders
+      details:
+        uri: https://secure.snd.payu.com/api/v2_1/orders/
 ---
 spring:
   config:

@@ -13,6 +13,7 @@ import com.ourkitchen.yourhealth.model.PaymentServiceEnum;
 import com.ourkitchen.yourhealth.model.PaymentStatus;
 import com.ourkitchen.yourhealth.util.Secrets;
 import lombok.RequiredArgsConstructor;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Service;
@@ -20,6 +21,7 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.Map;
 
@@ -33,6 +35,8 @@ public class PaymentService {
     private final PayUClient payUClient;
     private final OrderMicroserviceClient orderMicroserviceClient;
     private final PaymentDetailsService paymentDetailsService;
+
+    private final KafkaTemplate<String, String> kafkaTemplate;
 
 
 
@@ -92,7 +96,26 @@ public class PaymentService {
                 .build();
 
 
+        kafkaTemplate.send("test-topic", "testMSG1 with order id: " + orderId + ", buuuaaaahhh");
+
         return payUClient.processPayment(payUPaymentRequestDTO, getAccessToken());
+    }
+
+    public String refreshPaymentStatus(String orderId) throws IOException {
+        PaymentDetails paymentDetails = paymentDetailsService.getPaymentByOrderId(orderId);
+        String paymentId = paymentDetails.getId().toString();
+
+        PaymentStatus currentStatus = paymentDetails.getPaymentStatus();
+        PaymentStatus newStatus = payUClient.paymentDetails(paymentId, getAccessToken());
+
+        if(!currentStatus.equals(newStatus)) {
+            paymentDetails.setPaymentStatus(newStatus);
+            paymentDetailsService.savePaymentDetails(paymentDetails);
+
+            kafkaTemplate.send("test-topic", "New payment status " + newStatus + " for order " + paymentDetails.getOrderId());
+        }
+
+        return newStatus.toString();
     }
 
     private Map<String, Object> retrieveAuthData() {
