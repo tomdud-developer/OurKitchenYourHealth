@@ -1,22 +1,29 @@
 package com.ourkitchen.yourhealth.client;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ourkitchen.yourhealth.dto.PayUPaymentRequestDTO;
+import com.ourkitchen.yourhealth.dto.PayUPaymentResponseDTO;
 import com.ourkitchen.yourhealth.dto.PaymentRequestDTO;
 import com.ourkitchen.yourhealth.model.PaymentStatus;
-import io.micrometer.observation.annotation.Observed;
+import com.ourkitchen.yourhealth.util.Secrets;
+import lombok.RequiredArgsConstructor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 
 import java.io.IOException;
+import java.util.Map;
 
 @Service
-public class PayUClient implements PaymentInterface {
+@RequiredArgsConstructor
+public class PayUClient {
 
     @Value("${payU.process.payment.uri}")
     private String PAYU_PAYMENT_URL;
@@ -24,12 +31,12 @@ public class PayUClient implements PaymentInterface {
     @Value("${payU.process.payment.details.uri}")
     private String PAYU_PAYMENT_DETAILS_URL;
 
-    @Override
-    public String processPayment(PaymentRequestDTO paymentRequestDTO, String accessToken) {
+    private final PayUAuthClient payUAuthClient;
+
+    public PayUPaymentResponseDTO processPayment(PaymentRequestDTO paymentRequestDTO) {
         PayUPaymentRequestDTO payUPaymentRequestDTO = (PayUPaymentRequestDTO) paymentRequestDTO;
 
         try {
-            String redirectURL = null;
             OkHttpClient client = new OkHttpClient.Builder()
                     .followRedirects(false)
                     .followSslRedirects(false)
@@ -39,6 +46,7 @@ public class PayUClient implements PaymentInterface {
             ObjectMapper objectMapper = new ObjectMapper();
             String processPaymentRequestJsonBody = objectMapper.writeValueAsString(payUPaymentRequestDTO);
             RequestBody requestBody = RequestBody.create(processPaymentRequestJsonBody, okhttp3.MediaType.parse("application/json"));
+            String accessToken = getAccessToken();
 
             Request request = new Request.Builder()
                     .url(PAYU_PAYMENT_URL)
@@ -48,24 +56,25 @@ public class PayUClient implements PaymentInterface {
 
             Response response = client.newCall(request).execute();
             String stringResponse = response.body().string();
-            JsonNode responseJson = objectMapper.readTree(stringResponse);
+            PayUPaymentResponseDTO responseDTO = objectMapper.readValue(stringResponse, PayUPaymentResponseDTO.class);
 
-            redirectURL = responseJson.get("redirectUri").asText();
-            return redirectURL;
+            return responseDTO;
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
 
-    public PaymentStatus paymentDetails(String orderId, String accessToken) throws IOException {
+    public PaymentStatus getPaymentStatus(String payUOrderId) throws IOException {
         OkHttpClient client = new OkHttpClient.Builder()
                 .followRedirects(false)
                 .followSslRedirects(false)
                 .retryOnConnectionFailure(true)
                 .build();
 
+        String accessToken = getAccessToken();
+
         Request request = new Request.Builder()
-                .url(PAYU_PAYMENT_DETAILS_URL + orderId)
+                .url(PAYU_PAYMENT_DETAILS_URL + payUOrderId)
                 .header("Authorization", accessToken)
                 .method("GET", null)
                 .build();
@@ -78,14 +87,42 @@ public class PayUClient implements PaymentInterface {
 
         ObjectMapper objectMapper = new ObjectMapper();
         JsonNode responseJson = objectMapper.readTree(stringResponse);
-        String statusCode = responseJson.get("status").get("statusCode").asText();
+        String statusCode = responseJson.findValue("status").asText();
 
         switch(statusCode) {
-            case "SUCCESS":
+            case "NEW":
+                return PaymentStatus.PAYMENT_STARTED;
+            case "COMPLETED":
                 return PaymentStatus.PAYMENT_SUCCESSFULLY_FINISHED;
+            case "DATA_NOT_FOUND":
+                return PaymentStatus.PAYMENT_ERROR;
             default:
                 return PaymentStatus.PAYMENT_ERROR;
         }
+    }
+
+
+    private String getAccessToken() throws HttpClientErrorException.Unauthorized {
+
+        String grant_type = "client_credentials";
+        String access_token = null;
+        ObjectMapper mapper = new ObjectMapper();
+
+        String jsonString =  payUAuthClient.getAccessToken(
+                grant_type,
+                Secrets.NONPRODUCTION_SANDBOX_PAYU_CLIENT_ID.toString(),
+                Secrets.NONPRODUCTION_SANDBOX_PAYU_CLIENT_SECRET.toString(),
+                Secrets.NONPRODUCTION_SANDBOX_PAYU_CLIENT_EMAIL.toString()
+        );
+
+        try {
+            Map<String, Object> map = mapper.readValue(jsonString, new TypeReference<Map<String,Object>>(){});
+            access_token = (String) map.get("access_token");
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("Internal Error with mapping JSON object");
+        }
+
+        return "Bearer " + access_token;
     }
 
 

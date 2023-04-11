@@ -1,13 +1,10 @@
 package com.ourkitchen.yourhealth.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ourkitchen.yourhealth.client.OrderMicroserviceClient;
-import com.ourkitchen.yourhealth.client.PayUAuthClient;
 import com.ourkitchen.yourhealth.client.PayUClient;
 import com.ourkitchen.yourhealth.dto.OrderInfoDTO;
 import com.ourkitchen.yourhealth.dto.PayUPaymentRequestDTO;
+import com.ourkitchen.yourhealth.dto.PayUPaymentResponseDTO;
 import com.ourkitchen.yourhealth.model.PaymentDetails;
 import com.ourkitchen.yourhealth.model.PaymentServiceEnum;
 import com.ourkitchen.yourhealth.model.PaymentStatus;
@@ -30,8 +27,6 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class PaymentService {
 
-    private final PayUAuthClient payUAuthClient;
-
     private final PayUClient payUClient;
     private final OrderMicroserviceClient orderMicroserviceClient;
     private final PaymentDetailsService paymentDetailsService;
@@ -39,11 +34,7 @@ public class PaymentService {
     private final KafkaTemplate<String, String> kafkaTemplate;
 
 
-
-    public String processPayment(String orderId) throws HttpClientErrorException.Unauthorized {
-        /*
-            Based on openID retrieve information about client, firstname and email
-        */
+    public PayUPaymentResponseDTO processPayment(String orderId) throws HttpClientErrorException.Unauthorized {
         Map<String, Object> claims = retrieveAuthData();
         String userId = claims.get("sub").toString();
         String email = claims.get("email").toString();
@@ -96,17 +87,23 @@ public class PaymentService {
                 .build();
 
 
-        kafkaTemplate.send("test-topic", "testMSG1 with order id: " + orderId + ", buuuaaaahhh");
+        kafkaTemplate.send("test-topic", "new payment with order id: " + orderId + ", buuuaaaahhh");
 
-        return payUClient.processPayment(payUPaymentRequestDTO, getAccessToken());
+        PayUPaymentResponseDTO responseDTO = payUClient.processPayment(payUPaymentRequestDTO);
+        String orderIdInPayU = responseDTO.getOrderId();
+        paymentDetails.setPayUOrderId(orderIdInPayU);
+
+        paymentDetails = paymentDetailsService.savePaymentDetails(paymentDetails);
+
+        return responseDTO;
     }
 
     public String refreshPaymentStatus(String orderId) throws IOException {
         PaymentDetails paymentDetails = paymentDetailsService.getPaymentByOrderId(orderId);
-        String paymentId = paymentDetails.getId().toString();
+        String payUOrderId = paymentDetails.getPayUOrderId();
 
         PaymentStatus currentStatus = paymentDetails.getPaymentStatus();
-        PaymentStatus newStatus = payUClient.paymentDetails(paymentId, getAccessToken());
+        PaymentStatus newStatus = payUClient.getPaymentStatus(payUOrderId);
 
         if(!currentStatus.equals(newStatus)) {
             paymentDetails.setPaymentStatus(newStatus);
@@ -126,29 +123,6 @@ public class PaymentService {
         return claims;
     }
 
-
-    private String getAccessToken() throws HttpClientErrorException.Unauthorized {
-
-        String grant_type = "client_credentials";
-        String access_token = null;
-        ObjectMapper mapper = new ObjectMapper();
-
-        String jsonString =  payUAuthClient.getAccessToken(
-                grant_type,
-                Secrets.NONPRODUCTION_SANDBOX_PAYU_CLIENT_ID.toString(),
-                Secrets.NONPRODUCTION_SANDBOX_PAYU_CLIENT_SECRET.toString(),
-                Secrets.NONPRODUCTION_SANDBOX_PAYU_CLIENT_EMAIL.toString()
-        );
-
-        try {
-            Map<String, Object> map = mapper.readValue(jsonString, new TypeReference<Map<String,Object>>(){});
-            access_token = (String) map.get("access_token");
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException("Internal Error with mapping JSON object");
-        }
-
-        return "Bearer " + access_token;
-    }
 
 
 }

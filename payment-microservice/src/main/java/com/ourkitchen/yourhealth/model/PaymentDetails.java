@@ -22,6 +22,7 @@ public class PaymentDetails {
     private String currencyCode;
     private String totalAmount;
     private String orderId;
+    private String payUOrderId;
     private String clientId;
     private String email;
     private PaymentStatus paymentStatus;

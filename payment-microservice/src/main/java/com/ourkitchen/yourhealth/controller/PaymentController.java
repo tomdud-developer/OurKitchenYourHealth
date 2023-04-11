@@ -1,6 +1,7 @@
 package com.ourkitchen.yourhealth.controller;
 
 
+import com.ourkitchen.yourhealth.dto.PayUPaymentResponseDTO;
 import com.ourkitchen.yourhealth.service.PaymentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -16,9 +17,9 @@ public class PaymentController {
     private final PaymentService paymentService;
 
     @PostMapping("/{orderId}")
-    public ResponseEntity<String> proccessPayment(@PathVariable String orderId) {
-        String url = paymentService.processPayment(orderId);
-        return ResponseEntity.ok(url);
+    public ResponseEntity<PayUPaymentResponseDTO> proccessPayment(@PathVariable String orderId) {
+        PayUPaymentResponseDTO responseDTO = paymentService.processPayment(orderId);
+        return ResponseEntity.ok(responseDTO);
     }
 
     @GetMapping("/{orderId}")
