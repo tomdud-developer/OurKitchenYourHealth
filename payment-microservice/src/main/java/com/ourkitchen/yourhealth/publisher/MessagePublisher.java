@@ -25,6 +25,6 @@ public class MessagePublisher {
                                             .newStatus(newStatus)
                                             .build();
 
-        kafkaTemplate.send("changePaymentStatusTopicName", changePaymentStatusMessage);
+        kafkaTemplate.send(changePaymentStatusTopicName, changePaymentStatusMessage);
     }
 }
