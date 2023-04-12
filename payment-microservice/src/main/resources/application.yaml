@@ -16,6 +16,8 @@ spring:
             token-uri: http://localhost:8180/auth/realms/ourkitchen-yourhealth/protocol/openid-connect/token
   kafka:
     bootstrap-servers: localhost:9092
+    custom:
+      change-payment-status-topic-name: change-payment-status
 message:
     topic:
       name: payment_status
@@ -53,7 +55,7 @@ logging:
     org.hibernate.SQL: debug
     org.hibernate.type.descriptor.sql.BasicBinder: trace
 server:
-  port: 8989
+  port: 0
 eureka:
   client:
     serviceUrl:

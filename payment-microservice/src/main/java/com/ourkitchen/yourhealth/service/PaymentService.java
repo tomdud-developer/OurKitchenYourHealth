@@ -8,6 +8,7 @@ import com.ourkitchen.yourhealth.dto.PayUPaymentResponseDTO;
 import com.ourkitchen.yourhealth.model.PaymentDetails;
 import com.ourkitchen.yourhealth.model.PaymentServiceEnum;
 import com.ourkitchen.yourhealth.model.PaymentStatus;
+import com.ourkitchen.yourhealth.publisher.MessagePublisher;
 import com.ourkitchen.yourhealth.util.Secrets;
 import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -31,7 +32,7 @@ public class PaymentService {
     private final OrderMicroserviceClient orderMicroserviceClient;
     private final PaymentDetailsService paymentDetailsService;
 
-    private final KafkaTemplate<String, String> kafkaTemplate;
+    private final MessagePublisher messagePublisher;
 
 
     public PayUPaymentResponseDTO processPayment(String orderId) throws HttpClientErrorException.Unauthorized {
@@ -87,7 +88,7 @@ public class PaymentService {
                 .build();
 
 
-        kafkaTemplate.send("test-topic", "new payment with order id: " + orderId + ", buuuaaaahhh");
+        //kafkaTemplate.send("test-topic", "new payment with order id: " + orderId + ", buuuaaaahhh");
 
         PayUPaymentResponseDTO responseDTO = payUClient.processPayment(payUPaymentRequestDTO);
         String orderIdInPayU = responseDTO.getOrderId();
@@ -108,8 +109,7 @@ public class PaymentService {
         if(!currentStatus.equals(newStatus)) {
             paymentDetails.setPaymentStatus(newStatus);
             paymentDetailsService.savePaymentDetails(paymentDetails);
-
-            kafkaTemplate.send("test-topic", "New payment status " + newStatus + " for order " + paymentDetails.getOrderId());
+            messagePublisher.publishChangePaymentStatusMessage(orderId, currentStatus, newStatus);
         }
 
         return newStatus.toString();
