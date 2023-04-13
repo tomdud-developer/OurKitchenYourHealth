@@ -38,6 +38,7 @@
         <module>api-gateway</module>
         <module>auth-service</module>
         <module>payment-microservice</module>
+        <module>restuarant-microservice</module>
     </modules>
 
     <dependencyManagement>

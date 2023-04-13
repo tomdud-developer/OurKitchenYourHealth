@@ -34,6 +34,19 @@ services:
       - MONGO_INITDB_ROOT_USERNAME=username
       - MONGO_INITDB_ROOT_PASSWORD=password
 
+  mongodb_restaurant_microservice:
+    image: mongo
+    container_name: mongodb_restaurant_microservice
+    ports:
+      - "27019:27019"
+    volumes:
+      - data:/data
+    command: mongod --port 27019
+    environment:
+      - PORT=27019
+      - MONGO_INITDB_ROOT_USERNAME=username
+      - MONGO_INITDB_ROOT_PASSWORD=password
+
   mongo-express-meals:
     image: mongo-express
     container_name: mongo-express-meals
@@ -59,6 +72,18 @@ services:
       - ME_CONFIG_MONGODB_ADMINPASSWORD=password
       - ME_CONFIG_MONGODB_SERVER=mongodb_orders_microservice
 
+  mongo-express-restaurants:
+    image: mongo-express
+    container_name: mongo-express-restaurants
+    restart: always
+    ports:
+      - "8083:8081"
+    environment:
+      - ME_CONFIG_MONGODB_PORT=27019
+      - ME_CONFIG_MONGODB_ADMINUSERNAME=username
+      - ME_CONFIG_MONGODB_ADMINPASSWORD=password
+      - ME_CONFIG_MONGODB_SERVER=mongodb_restaurant_microservice
+
   zipkin:
     image: openzipkin/zipkin
     container_name: zipkin_container
@@ -78,6 +103,8 @@ services:
     image: confluentinc/cp-kafka:latest
     depends_on:
       - zookeeper
+    volumes:
+      - data:/kafka
     ports:
       - "29092:29092"
     environment:
