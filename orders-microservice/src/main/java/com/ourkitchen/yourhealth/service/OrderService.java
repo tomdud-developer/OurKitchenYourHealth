@@ -13,6 +13,7 @@ import io.jsonwebtoken.Jwts;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.mongodb.core.aggregation.BooleanOperators;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Service;
@@ -86,6 +87,10 @@ public class OrderService {
         log.info(String.format("Placing an order from user %s", order.getUserId()));
 
         return savedOrder;
+    }
+
+    public Order updateOrder(Order order) {
+        return orderRepository.save(order);
     }
 
     @Transactional
