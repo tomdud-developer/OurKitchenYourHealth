@@ -19,9 +19,6 @@ public class KafkaProducerConfig {
     public ProducerFactory<String, String> producerFactory() {
         Map<String, Object> configProps = new HashMap<>();
         configProps.put(
-                ProducerConfig.BOOTSTRAP_SERVERS_CONFIG,
-                "http://localhost:29092");
-        configProps.put(
                 ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG,
                 StringSerializer.class);
         configProps.put(
@@ -33,9 +30,6 @@ public class KafkaProducerConfig {
     @Bean
     public ProducerFactory<String, ChangePaymentStatusMessage> changePaymentStatusMessageProducerFactory() {
         Map<String, Object> configProps = new HashMap<>();
-        configProps.put(
-                ProducerConfig.BOOTSTRAP_SERVERS_CONFIG,
-                "http://localhost:29092");
         configProps.put(
                 ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG,
                 StringSerializer.class);

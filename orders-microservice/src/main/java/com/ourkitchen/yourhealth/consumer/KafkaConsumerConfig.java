@@ -23,9 +23,6 @@ public class KafkaConsumerConfig {
     public ConsumerFactory<String, ChangePaymentStatusMessage> changePaymentStatusMessageConsumerFactory() {
         Map<String, Object> configProps = new HashMap<>();
         configProps.put(
-                ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG,
-                "http://localhost:29092");
-        configProps.put(
                 ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG,
                 StringDeserializer.class);
         configProps.put(
