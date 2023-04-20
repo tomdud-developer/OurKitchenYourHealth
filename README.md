@@ -31,17 +31,17 @@ Overall, the use of microservices in Java provides a reliable and efficient fram
 System is designed in microservices architecture. Each microservice has own bussines responsibility.
 
 1. API gateway service
-2. Security service
-3. Eureka server
-4. Registration microservice #TODO
-5. Customer microservice #TODO //maybe i should connect 3. and 4.
-6. Meals microservice
-7. Orders microservice
-8. Kitchen microservice
-9. Delivery microservice
-10. Demand microservice
+2. Eureka discovery server
+3. Keycloak auth service
+4. Meals microservice
+5. Orders microservice
+6. Payment microservice
+7. Restaurant microservice
+8. Resources microservice [not done yet]
+9. [There will be anothers, but they haven't devloped yet]
 
-[Structure](assets/Catering.svg)
+
+![Architecture_diagram.svg](assets%2FArchitecture_diagram.svg)
 
 
 ## Requirements
@@ -60,11 +60,3 @@ After a successful payment, the order status will be updated to "success payment
 
 To ensure the smooth running of operations, the restaurants must have a daily list of ingredients and meals that they need to order and prepare for the following day.
 This practice allows for proper planning and organization of resources, ensuring that the restaurants are adequately stocked and prepared to meet the demands of their customers.
-
-
-
-## Meals microservice
-
-Meals microservice offers access to ready to order meals, meals creator, ingredients adding, calories calculating.
-
-![Structure](assets/MealsMicroservice.svg)
