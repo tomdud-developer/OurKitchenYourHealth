@@ -16,3 +16,6 @@ kafka-console-producer --topic change-payment-status --bootstrap-server localhos
 kafka-console-consumer --topic test-topic --from-beginning --bootstrap-server localhost:9092
 kafka-console-consumer --topic change-payment-status --from-beginning --bootstrap-server localhost:9092
 
+kafka-topics --list --bootstrap-server localhost:9092
+
+{"orderId":"643ed9a89e040a67122c859f","oldStatus":"PAYMENT_STARTED","newStatus":"PAYMENT_SUCCESSFULLY_FINISHED"}

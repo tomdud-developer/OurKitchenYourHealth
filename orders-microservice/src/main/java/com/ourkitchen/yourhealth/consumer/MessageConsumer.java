@@ -5,6 +5,7 @@ import com.ourkitchen.yourhealth.model.Order;
 import com.ourkitchen.yourhealth.model.OrderStatus;
 import com.ourkitchen.yourhealth.service.OrderService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -12,15 +13,20 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class MessageConsumer {
     private final OrderService orderService;
 
     @KafkaListener(
             topics = "${spring.kafka.custom.change-payment-status-topic-name}",
-            containerFactory = "changePaymentStatusMessageKafkaListenerContainerFactory")
+            containerFactory = "changePaymentStatusMessageKafkaListenerContainerFactory",
+            groupId = "changePaymentStatus")
     public void greetingListener(ChangePaymentStatusMessage changePaymentStatusMessage) {
+
         String orderId = changePaymentStatusMessage.getOrderId();
         Order order = orderService.getOrderInfo(orderId);
+
+        log.info("Receive kafka changePaymentStatus for orderId {}", orderId);
 
         OrderStatus currentOrderStatus = order.getOrderStatus();
         if(changePaymentStatusMessage.oldStatus.equals(PaymentStatus.PAYMENT_STARTED)
