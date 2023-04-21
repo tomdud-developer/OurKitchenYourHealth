@@ -5,6 +5,7 @@ import com.ourkitchen.yourhealth.exeption.OrderNotFoundException;
 import com.ourkitchen.yourhealth.model.Order;
 import com.ourkitchen.yourhealth.model.OrderOneDay;
 import com.ourkitchen.yourhealth.model.OrderStatus;
+import com.ourkitchen.yourhealth.publisher.MessagePublisher;
 import com.ourkitchen.yourhealth.repository.OrderOneDayRepository;
 import com.ourkitchen.yourhealth.repository.OrderRepository;
 import io.jsonwebtoken.Claims;
@@ -35,6 +36,8 @@ public class OrderService {
     private final OrderOneDayRepository orderOneDayRepository;
 
     private final MealsServiceClient mealsServiceClient;
+
+    private final MessagePublisher messagePublisher;
 
     @Transactional
     public Order createOrder(Order order) throws IllegalStateException {
@@ -83,6 +86,14 @@ public class OrderService {
         order.setUserId(userId);
 
         Order savedOrder = orderRepository.save(order);
+
+        // publish message via kafka
+        messagePublisher.publishChangePaymentStatusMessage(
+                savedOrder.getId(),
+                OrderStatus.NOT_CREATED,
+                savedOrder.getOrderStatus(),
+                savedOrder.getUserId()
+        );
 
         log.info(String.format("Placing an order from user %s", order.getUserId()));
 

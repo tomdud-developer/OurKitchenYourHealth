@@ -1,6 +1,7 @@
 package com.ourkitchen.yourhealth.model;
 
 public enum OrderStatus {
+    NOT_CREATED("Not created"),
     CREATED_NOT_CONFIRMED("Created"),
     WAITING_FOR_PAYMENT("Waiting for payment"),
     PAYMENT_PENDING("Payment pending"),
