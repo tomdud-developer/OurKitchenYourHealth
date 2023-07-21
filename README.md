@@ -1,3 +1,5 @@
+
+# Warning! The project in a pause state because of studies, I return to this in August when I learn more about AWS and I will start using it in this project
 # About Our Kitchen - Your Health
 
 **Our Kitchen - Your Health** is a unique **FICTIONAL** catering company that specializes in providing fresh and healthy meals for its customers. 
